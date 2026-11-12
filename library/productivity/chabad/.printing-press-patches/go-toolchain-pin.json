@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "id": "go-toolchain-pin",
+  "files": ["go.mod"],
+  "marker": "toolchain go1.27.4",
+  "reason": "The generator emits `go 1.26.10`; net/http in Go 1.26.10 (and the local 1.27.3) carries GO-2026-6859, so govulncheck fails. Pinning toolchain go1.27.4 makes builds and govulncheck use a patched standard library. Drop this once the generator emits a patched Go version."
+}

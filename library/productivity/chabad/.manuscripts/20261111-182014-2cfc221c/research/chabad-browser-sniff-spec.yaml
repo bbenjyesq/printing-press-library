@@ -1,0 +1,223 @@
+name: chabad
+description: Discovered API spec for chabad
+version: 0.1.0
+base_url: https://www.chabad.org
+spec_source: sniffed
+auth:
+    type: none
+    header: ""
+    format: ""
+    env_vars: []
+auth_warnings:
+    - 'rejected auth candidate "limit" from query: search input'
+config:
+    format: toml
+    path: ~/.config/chabad-pp-cli/config.toml
+resources:
+    WebServices:
+        description: Operations on Get_Locations
+        endpoints:
+            list_Get_Locations:
+                method: GET
+                path: /WebServices/RemoteCall/Get_Locations
+                description: GET /WebServices/RemoteCall/Get_Locations
+                params:
+                    - name: location
+                      type: string
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                body: []
+                response:
+                    type: array
+                    item: GetLocationSuggestion
+                pagination: null
+                response_path: Suggestions
+    webservices:
+        description: Operations on Get_Zmanim
+        endpoints:
+            list_Get_Zmanim:
+                method: GET
+                path: /webservices/zmanim/zmanim/Get_Zmanim
+                description: GET /webservices/zmanim/zmanim/Get_Zmanim
+                params:
+                    - name: aid
+                      type: integer
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: enddate
+                      type: string
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: locationid
+                      type: integer
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: locationtype
+                      type: integer
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: startdate
+                      type: string
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: tdate
+                      type: string
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                body: []
+                response:
+                    type: array
+                    item: GetZmanimDay
+                pagination: null
+                response_path: Days
+            list_Load_CandleLightingWeeks:
+                method: GET
+                path: /webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks
+                description: GET /webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks
+                params:
+                    - name: limit
+                      type: integer
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: locationid
+                      type: integer
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: locationtype
+                      type: integer
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: startdate
+                      type: string
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                body: []
+                response:
+                    type: array
+                    item: LoadCandleLightingWeekGroup
+                pagination: null
+                response_path: Groups
+types:
+    Day:
+        fields:
+            - name: ArticleId
+              type: integer
+            - name: CalendarEntryArticleId
+              type: integer
+            - name: Day
+              type: integer
+            - name: ElementType
+              type: integer
+            - name: IsDayOfDstChange
+              type: bool
+            - name: IsPrimaryHoliday
+              type: bool
+            - name: IsWeekOfDstChange
+              type: bool
+            - name: JewishDate
+              type: object
+            - name: JewishDay
+              type: integer
+            - name: JewishMonth
+              type: integer
+            - name: JewishYear
+              type: integer
+            - name: LightFromPreexistingFlame
+              type: bool
+            - name: Month
+              type: integer
+            - name: PrimaryZman
+              type: object
+            - name: PrimaryZmanType
+              type: integer
+            - name: Title
+              type: string
+            - name: WhenToLightString
+              type: string
+    GetLocationSuggestion:
+        fields:
+            - name: ItemType
+              type: string
+            - name: Title
+              type: string
+            - name: Value
+              type: string
+    GetZmanimDay:
+        fields:
+            - name: DayOfWeek
+              type: integer
+            - name: DisplayDate
+              type: string
+            - name: GmtDate
+              type: string
+            - name: IsDayOfDstChange
+              type: bool
+            - name: IsDstActive
+              type: bool
+            - name: IsHoliday
+              type: bool
+            - name: TimeGroups
+              type: '[]ref:TimeGroup'
+    LoadCandleLightingWeekGroup:
+        fields:
+            - name: Days
+              type: '[]ref:Day'
+            - name: GroupHeaderArticleId
+              type: string
+            - name: GroupHeaderTitle
+              type: string
+            - name: GroupHeaderType
+              type: string
+    TimeGroup:
+        fields:
+            - name: EssentialTitle
+              type: string
+            - name: EssentialZmanType
+              type: string
+            - name: FootnoteType
+              type: string
+            - name: HebrewTitle
+              type: string
+            - name: InfoMessageIndex
+              type: integer
+            - name: Items
+              type: array
+            - name: Order
+              type: integer
+            - name: Title
+              type: string
+            - name: ZmanType
+              type: string

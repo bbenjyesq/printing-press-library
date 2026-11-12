@@ -1,0 +1,8 @@
+# Root-anchored so cmd/<binary>/ source stays tracked.
+/chabad-pp-cli
+/chabad-pp-cli.exe
+/chabad-pp-mcp
+/chabad-pp-mcp.exe
+/bin/
+/build/
+/dist/

@@ -1,0 +1,260 @@
+{
+  "api_name": "chabad",
+  "novelty_score": 0,
+  "alternatives": [
+    {
+      "name": "hebcal",
+      "url": "https://github.com/hebcal/hebcal",
+      "language": "Go",
+      "install_method": "",
+      "stars": 189,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "chabad-org-zmanim",
+      "url": "https://github.com/toolsforshlichus/chabad-org-zmanim",
+      "language": "TypeScript",
+      "install_method": "",
+      "stars": 0,
+      "last_updated": "",
+      "command_count": 7,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "pyluach",
+      "url": "https://github.com/simlist/pyluach",
+      "language": "Python",
+      "install_method": "",
+      "stars": 72,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "py-libhdate",
+      "url": "https://github.com/py-libhdate/py-libhdate",
+      "language": "Python",
+      "install_method": "",
+      "stars": 42,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "zmanim-mcp-server",
+      "url": "https://github.com/ariroffe72/zmanim-mcp-server",
+      "language": "Python",
+      "install_method": "",
+      "stars": 2,
+      "last_updated": "",
+      "command_count": 6,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "rzman",
+      "url": "https://github.com/hummusonrails/rzman",
+      "language": "Ruby",
+      "install_method": "",
+      "stars": 0,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    }
+  ],
+  "gaps": [],
+  "patterns": [],
+  "recommendation": "proceed",
+  "researched_at": "2026-11-12T02:45:00Z",
+  "novel_features": [
+    {
+      "name": "Today dashboard",
+      "command": "today",
+      "description": "One screen with the Hebrew date, parsha, holiday, today's zmanim with the next one highlighted, the Omer count, and today's Chitas and Rambam.",
+      "rationale": "Joins Chabad.org's zmanim webservice, its daily-study feed, and local calendar math that no single Chabad.org page combines.",
+      "example": "chabad-pp-cli today --location 11213",
+      "why_it_matters": "Reach for this when an agent needs everything about today's Jewish day in one structured call instead of four lookups.",
+      "group": "Your Jewish day at a glance"
+    },
+    {
+      "name": "Next zman countdown",
+      "command": "next",
+      "description": "The next halachic times and how many minutes until each, rolling into tomorrow's dawn, with an exit-code mode for automation.",
+      "rationale": "Flattens two days of Chabad.org zmanim in the location's time zone and computes time-until locally.",
+      "example": "chabad-pp-cli next --location 11213 --zman candle-lighting --agent",
+      "why_it_matters": "Use it to answer 'when is the next zman' or to gate a Shabbat-mode trigger without re-implementing day rollover.",
+      "group": "Your Jewish day at a glance"
+    },
+    {
+      "name": "Weekly bulletin block",
+      "command": "bulletin",
+      "description": "A copy-paste weekly block for newsletters and shul signage (--format md|plain, --days N): Shabbat times with week-over-week change, parsha, Hebrew date, Mevarchim and Rosh Chodesh notices, and upcoming holidays, for one or more locations.",
+      "rationale": "Composes Chabad.org's Shabbat/holiday groups, day records, and local molad math into one block no Chabad.org page produces.",
+      "example": "chabad-pp-cli bulletin --location 11213 --location 247",
+      "why_it_matters": "Use it when someone needs this week's Shabbat announcement text, not raw times.",
+      "group": "Planning ahead"
+    },
+    {
+      "name": "Holiday-season lookahead",
+      "command": "ahead",
+      "description": "Every fast, erev Yom Tov, Yom Tov end, Rosh Chodesh, Shabbat Mevarchim and first Chanukah candle in the next N days, each with the times it needs (candle lighting, light-from-flame, fast start and end, chametz deadlines); --all adds minor and Chassidic dates.",
+      "rationale": "Scans a window of Chabad.org day records and attaches the event-specific zmanim each day carries.",
+      "example": "chabad-pp-cli ahead --location 11213 --days 30",
+      "why_it_matters": "Use it to plan the coming weeks around holidays and fasts with Chabad.org's exact times.",
+      "group": "Planning ahead"
+    },
+    {
+      "name": "Family occasions list",
+      "command": "occasions",
+      "description": "Keep a local list of family yahrzeits, Hebrew birthdays, anniversaries and bar/bat-mitzvah dates and see which fall in the coming days.",
+      "rationale": "Stores people's Hebrew-date events locally and expands them to Gregorian dates, which the one-person-at-a-time Chabad.org calculators cannot do.",
+      "example": "chabad-pp-cli occasions upcoming --days 30",
+      "why_it_matters": "Use it when the question is 'whose yahrzeit or Hebrew birthday is coming up' across many people.",
+      "group": "Local state that compounds"
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Today dashboard",
+      "command": "today",
+      "description": "One screen with the Hebrew date, parsha, holiday, today's zmanim with the next one highlighted, the Omer count, and today's Chitas and Rambam.",
+      "rationale": "Joins Chabad.org's zmanim webservice, its daily-study feed, and local calendar math that no single Chabad.org page combines.",
+      "example": "chabad-pp-cli today --location 11213",
+      "why_it_matters": "Reach for this when an agent needs everything about today's Jewish day in one structured call instead of four lookups.",
+      "group": "Your Jewish day at a glance"
+    },
+    {
+      "name": "Next zman countdown",
+      "command": "next",
+      "description": "The next halachic times and how many minutes until each, rolling into tomorrow's dawn, with an exit-code mode for automation.",
+      "rationale": "Flattens two days of Chabad.org zmanim in the location's time zone and computes time-until locally.",
+      "example": "chabad-pp-cli next --location 11213 --zman candle-lighting --agent",
+      "why_it_matters": "Use it to answer 'when is the next zman' or to gate a Shabbat-mode trigger without re-implementing day rollover.",
+      "group": "Your Jewish day at a glance"
+    },
+    {
+      "name": "Weekly bulletin block",
+      "command": "bulletin",
+      "description": "A copy-paste weekly block for newsletters and shul signage (--format md|plain, --days N): Shabbat times with week-over-week change, parsha, Hebrew date, Mevarchim and Rosh Chodesh notices, and upcoming holidays, for one or more locations.",
+      "rationale": "Composes Chabad.org's Shabbat/holiday groups, day records, and local molad math into one block no Chabad.org page produces.",
+      "example": "chabad-pp-cli bulletin --location 11213 --location 247",
+      "why_it_matters": "Use it when someone needs this week's Shabbat announcement text, not raw times.",
+      "group": "Planning ahead"
+    },
+    {
+      "name": "Holiday-season lookahead",
+      "command": "ahead",
+      "description": "Every fast, erev Yom Tov, Yom Tov end, Rosh Chodesh, Shabbat Mevarchim and first Chanukah candle in the next N days, each with the times it needs (candle lighting, light-from-flame, fast start and end, chametz deadlines); --all adds minor and Chassidic dates.",
+      "rationale": "Scans a window of Chabad.org day records and attaches the event-specific zmanim each day carries.",
+      "example": "chabad-pp-cli ahead --location 11213 --days 30",
+      "why_it_matters": "Use it to plan the coming weeks around holidays and fasts with Chabad.org's exact times.",
+      "group": "Planning ahead"
+    },
+    {
+      "name": "Family occasions list",
+      "command": "occasions",
+      "description": "Keep a local list of family yahrzeits, Hebrew birthdays, anniversaries and bar/bat-mitzvah dates and see which fall in the coming days.",
+      "rationale": "Stores people's Hebrew-date events locally and expands them to Gregorian dates, which the one-person-at-a-time Chabad.org calculators cannot do.",
+      "example": "chabad-pp-cli occasions upcoming --days 30",
+      "why_it_matters": "Use it when the question is 'whose yahrzeit or Hebrew birthday is coming up' across many people.",
+      "group": "Local state that compounds"
+    }
+  ],
+  "narrative": {
+    "display_name": "Chabad.org",
+    "headline": "Chabad.org's zmanim, Shabbat and holiday times, and daily Chitas in your terminal, plus a today dashboard, next-zman countdown, and weekly bulletin.",
+    "value_prop": "chabad-pp-cli uses the same times Chabad.org publishes, following Chabad custom (18-minute candle lighting, 40 in Jerusalem, and the Chabad Shabbat-end time), where generic calendars use Hebcal defaults. Run `today` for the whole Jewish day on one screen, `next` for a countdown to the next zman, `bulletin` for this week's newsletter block, and `ahead` for the holidays and fasts coming up. Every command works with --json for scripts and agents.",
+    "auth_narrative": "No account or API key. The CLI calls Chabad.org's public zmanim webservices and daily-study feed. Set a default location once with `chabad-pp-cli locations use \u003cZIP or city\u003e`.",
+    "quickstart": [
+      {
+        "command": "chabad-pp-cli doctor --dry-run",
+        "comment": "Check the install without touching the network"
+      },
+      {
+        "command": "chabad-pp-cli locations --query Brooklyn",
+        "comment": "Find your Chabad.org location ID (a ZIP or a city ID)"
+      },
+      {
+        "command": "chabad-pp-cli shabbat --location 11213",
+        "comment": "This week's candle lighting, Shabbat end, and parsha"
+      },
+      {
+        "command": "chabad-pp-cli today --location 11213",
+        "comment": "The whole Jewish day on one screen"
+      },
+      {
+        "command": "chabad-pp-cli study",
+        "comment": "Today's Chumash, Tehillim, Tanya, Hayom Yom and Rambam"
+      }
+    ],
+    "troubleshoots": [
+      {
+        "symptom": "No location given and no default set",
+        "fix": "Pass --location 11213 (a ZIP or city name), or save one with: chabad-pp-cli locations use 11213"
+      },
+      {
+        "symptom": "A city name matched the wrong place",
+        "fix": "Run: chabad-pp-cli locations --query \"\u003ccity\u003e\" and reuse the exact Value it returns (or city:\u003cValue\u003e for a city id) as your location"
+      },
+      {
+        "symptom": "zmanim returns fewer days than requested",
+        "fix": "Chabad.org caps one call at about 180 days; split long ranges into several --from/--to calls (holidays and ahead do this for you)"
+      },
+      {
+        "symptom": "HTTP 500 or an XML error body from a webservice",
+        "fix": "The service needs Accept: application/json, which the CLI sends; if you call it yourself, add that header"
+      }
+    ],
+    "when_to_use": "Use this CLI when a user or agent needs Jewish calendar facts as Chabad.org publishes them: zmanim, Shabbat and Yom Tov candle-lighting and end times, the weekly parsha, holiday dates, Hebrew dates, the Omer, yahrzeits and Hebrew birthdays, or the daily Chitas and Rambam schedule. It is the right choice for newsletters, shul display boards, Shabbat-mode automation, and quick 'when is Shabbat' answers that should follow Chabad custom.",
+    "anti_triggers": [
+      "Do not use it for Chabad.org articles, Torah texts, Jewish History entries or Laws \u0026 Customs text; those pages are not part of this CLI",
+      "Do not use it for Daf Yomi or Mishna Yomi; Chabad.org's feeds here do not publish them",
+      "Do not use it as a halachic ruling; for questions of practice, ask a rabbi",
+      "Do not use it to find or contact a Chabad center"
+    ],
+    "recipes": [
+      {
+        "title": "This week's Shabbat for two cities",
+        "command": "chabad-pp-cli bulletin --location 11213 --location 247",
+        "explanation": "A newsletter-ready block for Brooklyn and Jerusalem, with each city's own candle-lighting custom."
+      },
+      {
+        "title": "Chanukah week, narrowed for an agent",
+        "command": "chabad-pp-cli zmanim --location-id 11213 --location-type 2 --from 2026-12-04 --to 2026-12-12 --agent --select DisplayDate,Parsha,HolidayName",
+        "explanation": "Pulls nine days of Chabad.org day records and keeps only the date, Torah reading, and holiday name."
+      },
+      {
+        "title": "Fire a trigger before candle lighting",
+        "command": "chabad-pp-cli next --location 11213 --zman candle-lighting --within 30m",
+        "explanation": "Exits 0 when candle lighting is within 30 minutes and 1 otherwise, so a cron job can start Shabbat mode."
+      },
+      {
+        "title": "What's coming up this month",
+        "command": "chabad-pp-cli ahead --location 11213 --days 30",
+        "explanation": "Fasts, erev Yom Tov and Rosh Chodesh in the next 30 days with the times each needs."
+      },
+      {
+        "title": "A yahrzeit for the next five years",
+        "command": "chabad-pp-cli yahrzeit 2015-03-10 --after-sunset --years 5",
+        "explanation": "Computes the Hebrew date of passing and its next five yahrzeits."
+      }
+    ],
+    "trigger_phrases": [
+      "when is candle lighting this week",
+      "what are today's zmanim",
+      "when is Pesach this year",
+      "what's today's Chitas",
+      "when is my father's yahrzeit",
+      "use chabad-pp-cli",
+      "run chabad"
+    ]
+  },
+  "homepage": "https://www.chabad.org"
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-11-12T04:34:17.500622Z",
+  "printing_press_version": "4.35.4",
+  "api_name": "chabad",
+  "display_name": "Chabad.org",
+  "cli_name": "chabad-pp-cli",
+  "creator": {
+    "handle": "bbenjyesq",
+    "name": "Bob Benjy"
+  },
+  "owner": "bbenjyesq",
+  "printer": "bbenjyesq",
+  "printer_name": "Bob Benjy",
+  "spec_path": "spec.yaml",
+  "spec_format": "internal",
+  "spec_source": "sniffed",
+  "spec_checksum": "sha256:b67ec5bc3d075fbadc00c881ca48729c7f4ced18cf2b1073e67c0dff6d08c61a",
+  "run_id": "20261111-182014-2cfc221c",
+  "category": "productivity",
+  "description": "Chabad.org's zmanim, Shabbat and holiday times, and daily Chitas in your terminal, plus a today dashboard, next-zman countdown, and weekly bulletin.",
+  "homepage": "https://www.chabad.org",
+  "mcp_binary": "chabad-pp-mcp",
+  "mcp_tool_count": 3,
+  "mcp_public_tool_count": 3,
+  "mcp_ready": "full",
+  "api_version": "0.1.0",
+  "auth_type": "none",
+  "novel_features": [
+    {
+      "name": "Today dashboard",
+      "command": "today",
+      "description": "One screen with the Hebrew date, parsha, holiday, today's zmanim with the next one highlighted, the Omer count, and today's Chitas and Rambam."
+    },
+    {
+      "name": "Next zman countdown",
+      "command": "next",
+      "description": "The next halachic times and how many minutes until each, rolling into tomorrow's dawn, with an exit-code mode for automation."
+    },
+    {
+      "name": "Weekly bulletin block",
+      "command": "bulletin",
+      "description": "A copy-paste weekly block for newsletters and shul signage (--format md|plain, --days N): Shabbat times with week-over-week change, parsha, Hebrew date, Mevarchim and Rosh Chodesh notices, and upcoming holidays, for one or more locations."
+    },
+    {
+      "name": "Holiday-season lookahead",
+      "command": "ahead",
+      "description": "Every fast, erev Yom Tov, Yom Tov end, Rosh Chodesh, Shabbat Mevarchim and first Chanukah candle in the next N days, each with the times it needs (candle lighting, light-from-flame, fast start and end, chametz deadlines); --all adds minor and Chassidic dates."
+    },
+    {
+      "name": "Family occasions list",
+      "command": "occasions",
+      "description": "Keep a local list of family yahrzeits, Hebrew birthdays, anniversaries and bar/bat-mitzvah dates and see which fall in the coming days."
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Today dashboard",
+      "command": "today",
+      "description": "One screen with the Hebrew date, parsha, holiday, today's zmanim with the next one highlighted, the Omer count, and today's Chitas and Rambam."
+    },
+    {
+      "name": "Next zman countdown",
+      "command": "next",
+      "description": "The next halachic times and how many minutes until each, rolling into tomorrow's dawn, with an exit-code mode for automation."
+    },
+    {
+      "name": "Weekly bulletin block",
+      "command": "bulletin",
+      "description": "A copy-paste weekly block for newsletters and shul signage: Shabbat times with week-over-week change, parsha, Hebrew date, Mevarchim and Rosh Chodesh notices, and upcoming holidays, for one or more locations."
+    },
+    {
+      "name": "Holiday-season lookahead",
+      "command": "ahead",
+      "description": "Every fast, erev Yom Tov, Yom Tov end, Rosh Chodesh and Erev Pesach in the next N days, each with the times it needs: candle lighting, light-from-flame, fast start and end, and the chametz deadlines."
+    },
+    {
+      "name": "Family occasions list",
+      "command": "occasions",
+      "description": "Keep a local list of family yahrzeits, Hebrew birthdays and bar/bat-mitzvah dates and see which fall in the coming days."
+    }
+  ],
+  "verify": {
+    "mode": "mock",
+    "pass_rate": 100,
+    "passed": 47,
+    "total": 47,
+    "data_pipeline": true,
+    "verdict": "PASS"
+  },
+  "scorecard": {
+    "steinberger": {
+      "percentage": 92,
+      "grade": "A",
+      "total": 92
+    }
+  }
+}

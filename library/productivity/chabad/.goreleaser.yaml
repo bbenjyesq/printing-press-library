@@ -1,0 +1,55 @@
+version: 2
+project_name: chabad-pp-cli
+changelog:
+  disable: true
+builds:
+  - id: chabad-pp-cli
+    main: ./cmd/chabad-pp-cli
+    binary: chabad-pp-cli
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/mvanhorn/printing-press-library/library/productivity/chabad/internal/cli.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+  - id: chabad-pp-mcp
+    main: ./cmd/chabad-pp-mcp
+    binary: chabad-pp-mcp
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+checksum:
+  name_template: checksums.txt
+brews:
+  - name: chabad-pp-cli
+    repository:
+      owner: bbenjyesq
+      name: homebrew-tap
+    homepage: "https://github.com/mvanhorn/printing-press-library"
+    description: "Chabad.org's zmanim, Shabbat and holiday times, and daily Chitas in your terminal, plus a today dashboard, next-zman countdown, and weekly bulletin no other tool has."
+    install: |
+      bin.install "chabad-pp-cli"
+      bin.install "chabad-pp-mcp"

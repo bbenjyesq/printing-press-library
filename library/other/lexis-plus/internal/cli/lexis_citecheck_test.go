@@ -20,7 +20,9 @@ func writeTestDocx(t *testing.T) string {
 		p("Opinion by: SMITH"), p("Opinion"),
 		`<w:p><w:r><w:t xml:space="preserve">[*101] We hold that HN1 a widget is not a service under the code</w:t></w:r>` +
 			`<w:r><w:footnoteReference w:customMarkFollows="1" w:id="2" /><w:t>1</w:t></w:r>` +
-			`<w:r><w:t xml:space="preserve"> and the seller must deliver it promptly. [*102] [**51] The buyer may reject a late widget without giving notice to anyone at all.</w:t></w:r></w:p>`,
+			`<w:r><w:t xml:space="preserve"> and the seller must deliver it promptly.</w:t></w:r></w:p>`,
+		p(" [*102] "), // a page marker alone in its own paragraph, as Lexis often writes it
+		p("[**51] The buyer may reject a late widget without giving notice to anyone at all."),
 		p("Dissent by: JONES"), p("Dissent"),
 		p("[*103] I would hold that a widget is always a service and never a good."),
 		p("End of Document"),

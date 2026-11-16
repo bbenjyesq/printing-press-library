@@ -210,6 +210,10 @@ func (d *ccDoc) parseCase(paras []string) {
 	for _, p := range paras {
 		c := ccClean(p)
 		if c == "" {
+			// Lexis often puts a page marker in a paragraph of its own; keep it or the page count slips.
+			if marks := ccStarRe.FindAllString(p, -1); len(marks) > 0 {
+				cur.Text += strings.Join(marks, " ") + "\n"
+			}
 			continue
 		}
 		if c == "End of Document" {

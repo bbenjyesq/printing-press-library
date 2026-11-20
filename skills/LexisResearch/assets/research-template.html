@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!--
+  LexisResearch — memo template (Lexis+ source of record).
+  Self-contained. Clone and fill the {{TOKENS}}; do not rebuild the CSS.
+  Status chips: class "verified" / "unverified". Risk chips: class "live" / "remote".
+  Repeat <tr> rows in the tables and <li> items as needed. Delete sections the
+  question does not need (the structure is elastic — do not pad a narrow lookup).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lexis Research — {{QUESTION_SHORT}}</title>
+<style>
+  :root{
+    --ink:#1a1d21; --muted:#5b6470; --line:#d9dde3; --paper:#ffffff; --wash:#f6f7f9;
+    --brand:#14524d; --brand-soft:#e5f0ee; --accent:#7a5b1e;
+    --green:#1f6b3b; --green-soft:#e7f3eb; --amber:#8a5a00; --amber-soft:#fbf2dd;
+    --red:#9b2226; --red-soft:#f7e7e7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--wash); color:var(--ink);
+    font-family:"Charter","Georgia","Cambria",serif; font-size:16px; line-height:1.55;
+  }
+  .sheet{max-width:860px; margin:32px auto; background:var(--paper);
+    border:1px solid var(--line); border-radius:4px; padding:48px 56px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .wpwarn{font-family:"SF Mono","Roboto Mono",ui-monospace,monospace; font-size:11px;
+    letter-spacing:.04em; text-transform:uppercase; color:var(--red);
+    border:1px solid var(--red); background:var(--red-soft); border-radius:3px;
+    padding:6px 10px; margin-bottom:6px; font-weight:600;}
+  .wpwarn.amber{color:var(--amber); border-color:var(--amber); background:var(--amber-soft);}
+  h1{font-size:26px; line-height:1.2; margin:18px 0 4px; letter-spacing:-.01em;}
+  .matter{color:var(--muted); font-size:14px; margin:0 0 16px;}
+  .banner{font-family:"SF Mono","Roboto Mono",ui-monospace,monospace; font-size:12px;
+    background:var(--brand-soft); border-left:4px solid var(--brand); color:var(--brand);
+    padding:10px 14px; border-radius:0 3px 3px 0; margin:16px 0 28px;}
+  h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--brand);
+    border-bottom:1.5px solid var(--brand); padding-bottom:5px; margin:34px 0 12px;}
+  .answer{background:var(--wash); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:0 4px 4px 0; padding:16px 18px; font-size:17px;}
+  p{margin:10px 0;}
+  ul{margin:8px 0; padding-left:22px;} li{margin:6px 0;}
+  cite,.cite{font-style:normal; font-family:"SF Mono","Roboto Mono",ui-monospace,monospace;
+    font-size:13px; background:var(--wash); padding:1px 5px; border-radius:3px;
+    border:1px solid var(--line);}
+  blockquote{margin:10px 0 10px 0; padding:8px 16px; border-left:3px solid var(--line);
+    color:#33373d; font-style:italic;}
+  .chip{display:inline-block; font-family:"SF Mono","Roboto Mono",ui-monospace,monospace;
+    font-size:10.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+    padding:2px 7px; border-radius:10px; border:1px solid;}
+  .verified{color:var(--green); background:var(--green-soft); border-color:var(--green);}
+  .unverified{color:var(--red); background:var(--red-soft); border-color:var(--red);}
+  .persuasive{color:var(--amber); background:var(--amber-soft); border-color:var(--amber);}
+  .live{color:var(--red); background:var(--red-soft); border-color:var(--red);}
+  .remote{color:var(--muted); background:var(--wash); border-color:var(--line);}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--brand-soft); color:var(--brand); font-family:"SF Mono",ui-monospace,monospace;
+    font-size:11px; text-transform:uppercase; letter-spacing:.05em;}
+  .worklist{font-family:"SF Mono","Roboto Mono",ui-monospace,monospace; font-size:13px;
+    line-height:1.7; background:var(--wash); border:1px solid var(--line); border-radius:4px;
+    padding:14px 16px; margin:12px 0; white-space:pre-wrap; user-select:all;}
+  .note{color:var(--muted); font-size:12.5px; margin:6px 0 0;}
+  .footer{margin-top:40px; padding-top:14px; border-top:1px solid var(--line);
+    color:var(--muted); font-size:12px; line-height:1.5;}
+  @media print{
+    body{background:#fff;} .sheet{box-shadow:none; border:none; margin:0; max-width:none;
+      padding:0;} h2{break-after:avoid;} table,.answer,.worklist{break-inside:avoid;}
+  }
+  @media(max-width:680px){ .sheet{padding:28px 20px;} }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="wpwarn">Attorney Work Product — Privileged &amp; Confidential</div>
+  <div class="wpwarn amber">Requires Attorney Review — Not for Filing Without Independent Verification</div>
+
+  <h1>{{QUESTION_TITLE}}</h1>
+  <p class="matter">Lexis+ Research Memo &middot; {{MATTER_OR_FORUM}} &middot; {{DATE}}</p>
+
+  <div class="banner">VERIFICATION: {{N}} citations checked &middot; {{X}} unverified/cut &middot; {{Y}} corrected &middot; {{Z}} red-flagged (Shepard's Warning) &middot; {{C}} Caution/Questioned. Text, pins, and quotes checked against the Lexis+ copy; Shepard's signals pulled {{DATE}}. Attorney must review before relying or filing.</div>
+
+  <h2>Research Question</h2>
+  <p>{{RESEARCH_QUESTION}}</p>
+
+  <h2>Short Answer</h2>
+  <div class="answer">{{SHORT_ANSWER}}</div>
+
+  <h2>Governing Statute(s) &amp; Rule(s)</h2>
+  {{GOVERNING_AUTHORITY}}
+  <!-- code section(s)/rule(s) to subdivision, verified operative text (verbatim), elements/test, burden, effective date; each gets a status chip. Delete this section if the question is purely case-law. -->
+
+  <h2>On-Point Authority by Proposition</h2>
+  <table>
+    <thead><tr><th>Proposition</th><th>Best Authority (cite + pin)</th><th>What it holds / supports</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>{{PROPOSITION}}</td>
+        <td><span class="cite">{{CITE_WITH_PIN}}</span></td>
+        <td>{{HOLDING}}</td>
+        <td><span class="chip verified">Verified</span></td>
+        <td>{{BINDING_OR_PERSUASIVE_AND_BACKUP}}</td>
+      </tr>
+      <!-- repeat rows. Use the "persuasive" chip to flag persuasive-only support; "unverified" for anything not primary-source confirmed. If a proposition has no clean CA support, say so in the row. -->
+    </tbody>
+  </table>
+
+  <h2>Persuasive &amp; Secondary Authority</h2>
+  {{PERSUASIVE_SECONDARY}}
+  <!-- sister-state/federal persuasive + secondary (Witkin, CEB, Rutter, law review), each labeled persuasive/secondary. Delete for a Quick lookup. -->
+
+  <h2>Contrary / Cautionary Authority</h2>
+  <ul>
+    <li><span class="chip live">Live</span> {{CONTRARY_LIVE_EXAMPLE}}</li>
+    <li><span class="chip remote">Remote</span> {{CONTRARY_REMOTE_EXAMPLE}}</li>
+  </ul>
+  <!-- authority cutting the other way, splits, and every negative-treatment flag from Phase 4. If the weight of authority is against the proposition, say so plainly. -->
+
+  <h2>Authorities Relied On</h2>
+  <table>
+    <thead><tr><th>Authority</th><th>Citation (canonical + pin)</th><th>Proposition</th><th>Status</th><th>Treatment note</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>{{CASE_OR_STATUTE}}</td>
+        <td><span class="cite">{{CITE}}</span></td>
+        <td>{{PROPOSITION_SHORT}}</td>
+        <td><span class="chip verified">Verified</span></td>
+        <td>{{TREATMENT_NOTE}}</td>
+      </tr>
+      <!-- repeat rows; use "unverified" chip for anything not primary-source confirmed -->
+    </tbody>
+  </table>
+
+  <h2>Shepard's Status</h2>
+  <p class="note">Shepard's signal for every cited case, pulled from Lexis+ on {{DATE}}. Red flags are explained from the deciding court's own language; Caution (yellow) and Questioned (orange) signals are listed but not analyzed — read the Shepard's report in Lexis+ before relying on any of them. Signals change: re-run before filing.</p>
+  <table>
+    <thead><tr><th>Case (full reporter cite)</th><th>Shepard's signal</th><th>Red flag(s) and what they mean for this memo</th><th>Memo file</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="cite">{{FULL_CITE}}</span></td>
+        <td>{{SIGNAL}}</td>
+        <td>{{RED_FLAG_BOTTOM_LINE_OR_NONE}}</td>
+        <td>{{RED_FLAG_MEMO_FILENAME_OR_DASH}}</td>
+      </tr>
+      <!-- one row per cited case -->
+    </tbody>
+  </table>
+  <div class="worklist">{{CITE_LIST}}</div>
+  <!-- cut-and-paste list of every cited case, one per line, full reporter cite with parallel cites -->
+
+  <h2>Gaps / Run Down Next</h2>
+  {{GAPS}}
+  <!-- coverage gaps; any UNVERIFIED authority (Lexis+ could not retrieve it); propositions left uncited; the single question that would most resolve the remaining uncertainty -->
+
+  <div class="footer">
+    AI-assisted legal research using the attorney's own Lexis+ subscription. Case text, pin cites,
+    quotations, Deering's statutory text, and Shepard's signals were pulled from Lexis+ on {{DATE}};
+    red flags were summarized, not exhaustively analyzed, and Caution/Questioned treatment was not
+    analyzed. This is <strong>not</strong> a substitute for the attorney's independent review of the
+    Shepard's reports and professional judgment. Verify every
+    load-bearing authority before relying on it or filing. California law controls. Generated {{DATE}}.
+  </div>
+
+</div>
+</body>
+</html>

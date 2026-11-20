@@ -1,0 +1,9 @@
+{
+  "dir": "\u003ccli-dir\u003e/chabad-pp-cli",
+  "research_dir": "\u003ccli-dir\u003e/20261111-182014-2cfc221c",
+  "verdict": "pass",
+  "actors": null,
+  "issues": [
+    "no Apify actor references found, skipping"
+  ]
+}

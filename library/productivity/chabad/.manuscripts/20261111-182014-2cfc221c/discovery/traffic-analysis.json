@@ -1,0 +1,419 @@
+{
+  "version": "1",
+  "summary": {
+    "target_url": "https://www.chabad.org/calendar/zmanim_cdo/aid/143790/jewish/Zmanim-Halachic-Times.htm",
+    "captured_at": "2026-11-12T02:31:33Z",
+    "entry_count": 4,
+    "api_entry_count": 3,
+    "noise_entry_count": 1,
+    "host_distribution": {
+      "www.chabad.org": 4
+    }
+  },
+  "reachability": {
+    "mode": "standard_http",
+    "confidence": 0.65,
+    "reasons": [
+      "no browser-only reachability signals observed"
+    ]
+  },
+  "protocols": [
+    {
+      "label": "rest_json",
+      "confidence": 0.75,
+      "evidence": [
+        {
+          "entry_index": 0,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/WebServices/RemoteCall/Get_Locations",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "JSON HTTP request/response without specialized protocol markers"
+        },
+        {
+          "entry_index": 1,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/zmanim/zmanim/Get_Zmanim",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "JSON HTTP request/response without specialized protocol markers"
+        },
+        {
+          "entry_index": 2,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "JSON HTTP request/response without specialized protocol markers"
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "candidates": [
+      {
+        "type": "none",
+        "confidence": 0.95
+      }
+    ]
+  },
+  "endpoint_clusters": [
+    {
+      "host": "www.chabad.org",
+      "method": "GET",
+      "path": "/WebServices/RemoteCall/Get_Locations",
+      "count": 1,
+      "statuses": [
+        200
+      ],
+      "content_types": [
+        "application/json; charset=utf-8"
+      ],
+      "size_class": "medium",
+      "request_shape": {},
+      "response_shape": {
+        "kind": "object",
+        "fields": [
+          {
+            "name": "Suggestions",
+            "type": "array",
+            "required": true
+          }
+        ]
+      },
+      "normalization_flags": [
+        "single-sample",
+        "single-status"
+      ],
+      "confidence": "low",
+      "evidence": [
+        {
+          "entry_index": 0,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/WebServices/RemoteCall/Get_Locations",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "endpoint cluster member"
+        }
+      ]
+    },
+    {
+      "host": "www.chabad.org",
+      "method": "GET",
+      "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+      "count": 1,
+      "statuses": [
+        200
+      ],
+      "content_types": [
+        "application/json; charset=utf-8"
+      ],
+      "size_class": "medium",
+      "request_shape": {},
+      "response_shape": {
+        "kind": "object",
+        "fields": [
+          {
+            "name": "CandleLightingOffset",
+            "type": "integer",
+            "required": true
+          },
+          {
+            "name": "City",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Coordinates",
+            "type": "object",
+            "required": true
+          },
+          {
+            "name": "EndDate",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Groups",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "IsDefaultLocation",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "IsNewLocation",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "LocationDetails",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "LocationName",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "PageTitle",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "StartDate",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "normalization_flags": [
+        "single-sample",
+        "single-status"
+      ],
+      "confidence": "low",
+      "evidence": [
+        {
+          "entry_index": 2,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "endpoint cluster member"
+        }
+      ]
+    },
+    {
+      "host": "www.chabad.org",
+      "method": "GET",
+      "path": "/webservices/zmanim/zmanim/Get_Zmanim",
+      "count": 1,
+      "statuses": [
+        200
+      ],
+      "content_types": [
+        "application/json; charset=utf-8"
+      ],
+      "size_class": "medium",
+      "request_shape": {},
+      "response_shape": {
+        "kind": "object",
+        "fields": [
+          {
+            "name": "City",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Coordinates",
+            "type": "object",
+            "required": true
+          },
+          {
+            "name": "Days",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "EndDate",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "FootnoteOrder",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "Footnotes",
+            "type": "object",
+            "required": true
+          },
+          {
+            "name": "GmtEndDate",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "GmtStartDate",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "GroupHeadings",
+            "type": "array",
+            "required": true
+          },
+          {
+            "name": "IsAdvanced",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "IsDefaultLocation",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "IsNewLocation",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "LocationDetails",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "LocationId",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "LocationName",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "PageTitle",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "normalization_flags": [
+        "single-sample",
+        "single-status"
+      ],
+      "confidence": "low",
+      "evidence": [
+        {
+          "entry_index": 1,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/zmanim/zmanim/Get_Zmanim",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "endpoint cluster member"
+        }
+      ]
+    }
+  ],
+  "request_sequences": [
+    {
+      "label": "observed_api_flow",
+      "confidence": 0.35,
+      "evidence": [
+        {
+          "entry_index": 0,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/WebServices/RemoteCall/Get_Locations",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "observed API request order"
+        },
+        {
+          "entry_index": 1,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/zmanim/zmanim/Get_Zmanim",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "observed API request order"
+        },
+        {
+          "entry_index": 2,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "observed API request order"
+        }
+      ],
+      "notes": [
+        "Capture order used; timing unavailable."
+      ]
+    }
+  ],
+  "pagination": [
+    {
+      "location": "query",
+      "name": "limit",
+      "confidence": 0.75,
+      "evidence": [
+        {
+          "entry_index": 2,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "pagination-like query parameter"
+        }
+      ]
+    }
+  ],
+  "candidate_commands": [
+    {
+      "name": "list_Get_Locations",
+      "resource": "Get_Locations",
+      "confidence": 0.55,
+      "rationale": "Derived from observed GET /WebServices/RemoteCall/Get_Locations traffic.",
+      "evidence": [
+        {
+          "entry_index": 0,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/WebServices/RemoteCall/Get_Locations",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "endpoint cluster member"
+        }
+      ]
+    },
+    {
+      "name": "list_Get_Zmanim",
+      "resource": "Get_Zmanim",
+      "confidence": 0.55,
+      "rationale": "Derived from observed GET /webservices/zmanim/zmanim/Get_Zmanim traffic.",
+      "evidence": [
+        {
+          "entry_index": 1,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/zmanim/zmanim/Get_Zmanim",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "endpoint cluster member"
+        }
+      ]
+    },
+    {
+      "name": "list_Load_CandleLightingWeeks",
+      "resource": "Load_CandleLightingWeeks",
+      "confidence": 0.55,
+      "rationale": "Derived from observed GET /webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks traffic.",
+      "evidence": [
+        {
+          "entry_index": 2,
+          "method": "GET",
+          "host": "www.chabad.org",
+          "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "reason": "endpoint cluster member"
+        }
+      ]
+    }
+  ]
+}

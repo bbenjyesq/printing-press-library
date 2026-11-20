@@ -1,0 +1,179 @@
+{
+  "api_name": "chabad",
+  "base_url": "https://www.chabad.org",
+  "description": "Chabad.org's zmanim, Shabbat and holiday times, and daily Chitas in your terminal, plus a today dashboard, next-zman countdown, and weekly bulletin.",
+  "mcp_ready": "full",
+  "http_transport": "standard",
+  "auth": {
+    "type": "none"
+  },
+  "required_headers": [
+    {
+      "name": "Accept",
+      "value": "application/json"
+    }
+  ],
+  "tools": [
+    {
+      "name": "candles_weeks",
+      "description": "Upcoming Shabbat and holiday groups with candle-lighting, 'light from a pre-existing flame' second-night times, Shabbat/holiday end times, Hebrew dates, and Torah readings. Optional: location-id (default: 11213), location-type (default: 2), from (plus 2 more). Returns array of CandleGroup.",
+      "method": "GET",
+      "path": "/webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks",
+      "no_auth": true,
+      "params": [
+        {
+          "name": "location-id",
+          "wire_name": "locationid",
+          "type": "string",
+          "location": "query",
+          "description": "Chabad.org location ID: a city ID (location-type 1) or a 5-digit US ZIP code (location-type 2). Defaults to 11213 (Crown Heights, Brooklyn), so 'sync' has a location to store."
+        },
+        {
+          "name": "location-type",
+          "wire_name": "locationtype",
+          "type": "int",
+          "location": "query",
+          "description": "1 = Chabad.org city ID, 2 = US ZIP code (default 2, matching the default ZIP)"
+        },
+        {
+          "name": "from",
+          "wire_name": "startdate",
+          "type": "string",
+          "location": "query",
+          "description": "Start searching for Shabbat/holidays from this day, YYYY-MM-DD (default: today)"
+        },
+        {
+          "name": "weeks",
+          "wire_name": "limit",
+          "type": "int",
+          "location": "query",
+          "description": "Number of Shabbat weeks to return; holiday groups inside the window are added on top (this is a count, not pagination)"
+        },
+        {
+          "name": "candle-minutes",
+          "wire_name": "before",
+          "type": "int",
+          "location": "query",
+          "description": "Light candles this many minutes before sunset instead of the location's Chabad.org default"
+        }
+      ]
+    },
+    {
+      "name": "locations_search",
+      "description": "Search Chabad.org locations by city name or US ZIP code. Value is the location ID; ItemType 1 = Chabad.org city ID, 2 = US ZIP code. Required: query. Returns array of LocationSuggestion.",
+      "method": "GET",
+      "path": "/WebServices/RemoteCall/Get_Locations",
+      "no_auth": true,
+      "params": [
+        {
+          "name": "query",
+          "wire_name": "location",
+          "type": "string",
+          "location": "query",
+          "description": "City name or US ZIP code to look up (e.g. 'Los Angeles', 'Jerusalem', '11213')",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "zmanim_days",
+      "description": "Per-day zmanim (dawn through midnight), candle-lighting and Shabbat-end times, Torah reading, and holiday name for a location over a date range (up to ~180 days per call). Required: location-id, location-type. Optional: from, to, all-opinions (plus 4 more). Returns array of ZmanimDay.",
+      "method": "GET",
+      "path": "/webservices/zmanim/zmanim/Get_Zmanim",
+      "no_auth": true,
+      "params": [
+        {
+          "name": "location-id",
+          "wire_name": "locationid",
+          "type": "string",
+          "location": "query",
+          "description": "Chabad.org location ID: a city ID (location-type 1) or a 5-digit US ZIP code (location-type 2). Find one with 'locations search'.",
+          "required": true
+        },
+        {
+          "name": "location-type",
+          "wire_name": "locationtype",
+          "type": "int",
+          "location": "query",
+          "description": "1 = Chabad.org city ID, 2 = US ZIP code, 3 = custom coordinates (use --coords and --tz)",
+          "required": true
+        },
+        {
+          "name": "from",
+          "wire_name": "startdate",
+          "type": "string",
+          "location": "query",
+          "description": "First day, YYYY-MM-DD (default: today)"
+        },
+        {
+          "name": "to",
+          "wire_name": "enddate",
+          "type": "string",
+          "location": "query",
+          "description": "Last day, YYYY-MM-DD (default: same as --from; ranges longer than ~180 days are truncated by Chabad.org)"
+        },
+        {
+          "name": "all-opinions",
+          "wire_name": "additional",
+          "type": "bool",
+          "location": "query",
+          "description": "Return every halachic opinion for each zman instead of the Chabad default"
+        },
+        {
+          "name": "coords",
+          "type": "string",
+          "location": "query",
+          "description": "Custom coordinates 'lat,lng' (with --location-type 3)"
+        },
+        {
+          "name": "tz",
+          "wire_name": "tzname",
+          "type": "string",
+          "location": "query",
+          "description": "Time zone for custom coordinates, Chabad.org format: IANA name with '/' written as '*' (e.g. America*New_York, Asia*Jerusalem)"
+        },
+        {
+          "name": "location-name",
+          "wire_name": "n",
+          "type": "string",
+          "location": "query",
+          "description": "Display name for custom coordinates"
+        },
+        {
+          "name": "candle-minutes",
+          "wire_name": "before",
+          "type": "int",
+          "location": "query",
+          "description": "Light candles this many minutes before sunset instead of the location's Chabad.org default (18 in most places, 40 in Jerusalem)"
+        }
+      ]
+    }
+  ],
+  "novel_features": [
+    {
+      "name": "Today dashboard",
+      "command": "today",
+      "description": "One screen with the Hebrew date, parsha, holiday, today's zmanim with the next one highlighted, the Omer count, and today's Chitas and Rambam."
+    },
+    {
+      "name": "Next zman countdown",
+      "command": "next",
+      "description": "The next halachic times and how many minutes until each, rolling into tomorrow's dawn, with an exit-code mode for automation."
+    },
+    {
+      "name": "Weekly bulletin block",
+      "command": "bulletin",
+      "description": "A copy-paste weekly block for newsletters and shul signage (--format md|plain, --days N): Shabbat times with week-over-week change, parsha, Hebrew date, Mevarchim and Rosh Chodesh notices, and upcoming holidays, for one or more locations."
+    },
+    {
+      "name": "Holiday-season lookahead",
+      "command": "ahead",
+      "description": "Every fast, erev Yom Tov, Yom Tov end, Rosh Chodesh, Shabbat Mevarchim and first Chanukah candle in the next N days, each with the times it needs (candle lighting, light-from-flame, fast start and end, chametz deadlines); --all adds minor and Chassidic dates."
+    },
+    {
+      "name": "Family occasions list",
+      "command": "occasions",
+      "description": "Keep a local list of family yahrzeits, Hebrew birthdays, anniversaries and bar/bat-mitzvah dates and see which fall in the coming days."
+    }
+  ]
+}

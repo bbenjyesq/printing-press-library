@@ -1,0 +1,333 @@
+{
+  "Days": [
+    {
+      "Parsha": "Vayigash",
+      "DisplayDate": "12/19/2026",
+      "HolidayName": null,
+      "IsHoliday": false,
+      "DayOfWeek": 6,
+      "Zmanim": [
+        {
+          "EssentialZmanType": "AlosHashachar",
+          "Zman": "5:42 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "EarliestTefillin",
+          "Zman": "6:20 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "NetzHachamah",
+          "Zman": "7:15 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "LatestShema",
+          "Zman": "9:31 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "LatestTefillah",
+          "Zman": "10:18 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Chatzos",
+          "Zman": "11:52 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "MinchahGedolah",
+          "Zman": "12:17 PM",
+          "FootnoteType": "LaterMincha"
+        },
+        {
+          "EssentialZmanType": "MinchahKetanah",
+          "Zman": "2:38 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "PlagHaminchah",
+          "Zman": "3:37 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Shkiah",
+          "Zman": "4:31 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ShabbatEndTime",
+          "Zman": "5:16 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ChatzosNight",
+          "Zman": "11:53 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ShaahZmanit",
+          "Zman": "47:04 min.",
+          "FootnoteType": "None"
+        }
+      ]
+    },
+    {
+      "Parsha": "Fast",
+      "DisplayDate": "12/20/2026",
+      "HolidayName": "Fast - 10 Tevet",
+      "IsHoliday": true,
+      "DayOfWeek": 0,
+      "Zmanim": [
+        {
+          "EssentialZmanType": "AlosHashachar",
+          "Zman": "5:42 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "EarliestTefillin",
+          "Zman": "6:21 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "NetzHachamah",
+          "Zman": "7:16 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "LatestShema",
+          "Zman": "9:32 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "LatestTefillah",
+          "Zman": "10:19 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Chatzos",
+          "Zman": "11:53 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "MinchahGedolah",
+          "Zman": "12:17 PM",
+          "FootnoteType": "LaterMincha"
+        },
+        {
+          "EssentialZmanType": "MinchahKetanah",
+          "Zman": "2:39 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "PlagHaminchah",
+          "Zman": "3:37 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Shkiah",
+          "Zman": "4:31 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Tzeis",
+          "Zman": "5:03 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ChatzosNight",
+          "Zman": "11:53 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ShaahZmanit",
+          "Zman": "47:03 min.",
+          "FootnoteType": "None"
+        }
+      ]
+    },
+    {
+      "Parsha": "Vayechi",
+      "DisplayDate": "12/21/2026",
+      "HolidayName": null,
+      "IsHoliday": false,
+      "DayOfWeek": 1,
+      "Zmanim": [
+        {
+          "EssentialZmanType": "AlosHashachar",
+          "Zman": "5:43 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "EarliestTefillin",
+          "Zman": "6:21 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "NetzHachamah",
+          "Zman": "7:16 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "LatestShema",
+          "Zman": "9:32 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "LatestTefillah",
+          "Zman": "10:19 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Chatzos",
+          "Zman": "11:53 AM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "MinchahGedolah",
+          "Zman": "12:18 PM",
+          "FootnoteType": "LaterMincha"
+        },
+        {
+          "EssentialZmanType": "MinchahKetanah",
+          "Zman": "2:39 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "PlagHaminchah",
+          "Zman": "3:38 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Shkiah",
+          "Zman": "4:32 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "Tzeis",
+          "Zman": "5:03 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ChatzosNight",
+          "Zman": "11:54 PM",
+          "FootnoteType": "None"
+        },
+        {
+          "EssentialZmanType": "ShaahZmanit",
+          "Zman": "47:03 min.",
+          "FootnoteType": "None"
+        }
+      ]
+    }
+  ],
+  "GroupHeadings": [
+    {
+      "EssentialZmanType": "AlosHashachar",
+      "Order": 0,
+      "EssentialTitle": "Dawn"
+    },
+    {
+      "EssentialZmanType": "EarliestTefillin",
+      "Order": 1,
+      "EssentialTitle": "Earliest<br />Tallit"
+    },
+    {
+      "EssentialZmanType": "NetzHachamah",
+      "Order": 2,
+      "EssentialTitle": "Sunrise"
+    },
+    {
+      "EssentialZmanType": "LatestShema",
+      "Order": 3,
+      "EssentialTitle": "Latest<br />Shema"
+    },
+    {
+      "EssentialZmanType": "LatestTefillah",
+      "Order": 4,
+      "EssentialTitle": "Latest<br />Shacharit"
+    },
+    {
+      "EssentialZmanType": "Chatzos",
+      "Order": 7,
+      "EssentialTitle": "Midday"
+    },
+    {
+      "EssentialZmanType": "MinchahGedolah",
+      "Order": 8,
+      "EssentialTitle": "Earliest<br />Mincha"
+    },
+    {
+      "EssentialZmanType": "MinchahKetanah",
+      "Order": 9,
+      "EssentialTitle": "Mincha<br />Ketanah"
+    },
+    {
+      "EssentialZmanType": "PlagHaminchah",
+      "Order": 10,
+      "EssentialTitle": "Plag<br />Hamincha"
+    },
+    {
+      "EssentialZmanType": "CandleLighting",
+      "Order": 11,
+      "EssentialTitle": "Candle<br />Lighting"
+    },
+    {
+      "EssentialZmanType": "Shkiah",
+      "Order": 12,
+      "EssentialTitle": "Sunset"
+    },
+    {
+      "EssentialZmanType": "Tzeis",
+      "Order": 14,
+      "EssentialTitle": "Nightfall"
+    },
+    {
+      "EssentialZmanType": "ShabbatEndTime",
+      "Order": 16,
+      "EssentialTitle": "Shabbat<br />Ends"
+    },
+    {
+      "EssentialZmanType": "ChatzosNight",
+      "Order": 19,
+      "EssentialTitle": "Midnight"
+    },
+    {
+      "EssentialZmanType": "ShaahZmanit",
+      "Order": 20,
+      "EssentialTitle": "Shaah Zmanit"
+    },
+    {
+      "EssentialZmanType": "",
+      "Order": 0,
+      "EssentialTitle": "Parshah/Holiday"
+    }
+  ],
+  "Footnotes": {
+    "LightCandlesAfter": "Light Candles after this time",
+    "LaterMincha": "When a halachic day is less than 12 hours, some wait a full 30 minutes after Chatzot.",
+    "MenorahLighting": "The menorah must burn for at least 30 minutes after nightfall. Therefore, you must ensure that the menorah will burn from the time they are kindled until at least 30 minutes after nightfall."
+  },
+  "FootnoteOrder": [
+    "LightCandlesAfter",
+    "LaterMincha",
+    "MenorahLighting"
+  ],
+  "IsNewLocation": false,
+  "LocationName": "Brooklyn, NY 11213",
+  "LocationDetails": "Candle Lighting is 18 mins. before sunset&nbsp; | &nbsp;-5 GMT",
+  "EndDate": "2/27/2027",
+  "GmtStartDate": "/Date(1788220800000)/",
+  "GmtEndDate": "/Date(1803686400000)/",
+  "IsAdvanced": false,
+  "PageTitle": "Zmanim - Halachic Times",
+  "IsDefaultLocation": false,
+  "City": null,
+  "Coordinates": {
+    "Latitude": 40.671767,
+    "Longitude": -73.935934
+  },
+  "LocationId": null
+}

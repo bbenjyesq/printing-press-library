@@ -1,0 +1,287 @@
+name: chabad
+description: "Chabad.org Jewish calendar from the terminal: zmanim, Shabbat and holiday candle-lighting, parsha, holidays, and the daily Chitas/Rambam study schedule"
+version: 0.1.0
+base_url: https://www.chabad.org
+spec_source: sniffed
+category: productivity
+http_transport: standard
+health_check_path: /tools/rss/dailystudy_rss.xml
+required_headers:
+  - name: Accept
+    value: application/json
+auth:
+  type: none
+config:
+  format: toml
+  path: ~/.config/chabad-pp-cli/config.toml
+learn:
+  ticker_patterns:
+    - "^[0-9]{5}$"
+  synonyms:
+    "shabbos": "shabbat"
+    "motzei shabbat": "shabbat ends"
+  entity_lookup_seeds:
+    holiday:
+      - canonical: Rosh Hashanah
+        aliases: [rosh hashana, jewish new year]
+      - canonical: Yom Kippur
+        aliases: [day of atonement]
+      - canonical: Sukkot
+        aliases: [sukkos, succos, sukkoth]
+      - canonical: Shemini Atzeret
+        aliases: [shmini atzeres, shemini atzeres]
+      - canonical: Simchat Torah
+        aliases: [simchas torah]
+      - canonical: Chanukah
+        aliases: [hanukkah, hanukah, chanuka]
+      - canonical: Purim
+        aliases: [purim day]
+      - canonical: Passover
+        aliases: [pesach, pesah]
+      - canonical: Shavuot
+        aliases: [shavuos, shavuoth]
+      - canonical: Fast - 9 Av
+        aliases: [tisha bav, tisha b'av, tishah b'av]
+      - canonical: Fast - 17 Tammuz
+        aliases: [shiva asar btammuz, 17th of tammuz]
+      - canonical: Fast - 10 Tevet
+        aliases: [asara btevet, asarah b'tevet, 10th of tevet]
+      - canonical: Fast of Gedalia
+        aliases: [tzom gedaliah, fast of gedaliah]
+      - canonical: Fast - Taanit Esther
+        aliases: [taanis esther, fast of esther]
+    zman:
+      - canonical: CandleLighting
+        aliases: [candle lighting, licht bentschen, light candles]
+      - canonical: ShabbatEndTime
+        aliases: [shabbat ends, havdalah, end of shabbat]
+      - canonical: Shkiah
+        aliases: [sunset, shkia]
+      - canonical: Tzeis
+        aliases: [nightfall, tzeit, tzeis hakochavim]
+      - canonical: AlosHashachar
+        aliases: [dawn, alos, alot hashachar]
+      - canonical: NetzHachamah
+        aliases: [sunrise, netz]
+      - canonical: LatestShema
+        aliases: [sof zman shema, latest shema]
+      - canonical: LatestTefillah
+        aliases: [sof zman tefillah, latest shacharit]
+      - canonical: Chatzos
+        aliases: [midday, chatzot, chatzos hayom]
+      - canonical: PlagHaminchah
+        aliases: [plag, plag hamincha]
+      - canonical: MinchahGedolah
+        aliases: [mincha gedolah, earliest mincha]
+      - canonical: EarliestTefillin
+        aliases: [misheyakir, earliest tallit]
+resources:
+  locations:
+    description: "Look up Chabad.org location IDs (cities and US ZIP codes) used by every zmanim and candle-lighting command"
+    endpoints:
+      search:
+        method: GET
+        path: /WebServices/RemoteCall/Get_Locations
+        description: "Search Chabad.org locations by city name or US ZIP code. Value is the location ID; ItemType 1 = Chabad.org city ID, 2 = US ZIP code."
+        example: "  chabad-pp-cli locations --query \"Los Angeles\""
+        happy_args: "--query=Brooklyn"
+        params:
+          - name: location
+            flag_name: query
+            type: string
+            required: true
+            description: "City name or US ZIP code to look up (e.g. 'Los Angeles', 'Jerusalem', '11213')"
+        response:
+          type: array
+          item: LocationSuggestion
+        response_path: Suggestions
+  zmanim:
+    description: "Daily halachic times (zmanim) from Chabad.org for a location and date range"
+    endpoints:
+      days:
+        method: GET
+        path: /webservices/zmanim/zmanim/Get_Zmanim
+        description: "Per-day zmanim (dawn through midnight), candle-lighting and Shabbat-end times, Torah reading, and holiday name for a location over a date range (up to ~180 days per call)."
+        example: "  chabad-pp-cli zmanim --location-id 11213 --location-type 2 --from 2026-12-04 --to 2026-12-12"
+        happy_args: "--location-id=11213;--location-type=2;--from=2026-12-04;--to=2026-12-06"
+        params:
+          - name: locationid
+            flag_name: location-id
+            type: string
+            required: true
+            description: "Chabad.org location ID: a city ID (location-type 1) or a 5-digit US ZIP code (location-type 2). Find one with 'locations search'."
+          - name: locationtype
+            flag_name: location-type
+            type: int
+            required: true
+            enum: ["1", "2", "3"]
+            description: "1 = Chabad.org city ID, 2 = US ZIP code, 3 = custom coordinates (use --coords and --tz)"
+          - name: startdate
+            flag_name: from
+            type: string
+            format: date
+            description: "First day, YYYY-MM-DD (default: today)"
+          - name: enddate
+            flag_name: to
+            type: string
+            format: date
+            description: "Last day, YYYY-MM-DD (default: same as --from; ranges longer than ~180 days are truncated by Chabad.org)"
+          - name: additional
+            flag_name: all-opinions
+            type: bool
+            description: "Return every halachic opinion for each zman instead of the Chabad default"
+          - name: coords
+            type: string
+            description: "Custom coordinates 'lat,lng' (with --location-type 3)"
+          - name: tzname
+            flag_name: tz
+            type: string
+            description: "Time zone for custom coordinates, Chabad.org format: IANA name with '/' written as '*' (e.g. America*New_York, Asia*Jerusalem)"
+          - name: n
+            flag_name: location-name
+            type: string
+            description: "Display name for custom coordinates"
+          - name: candle_minutes
+            url_name: before
+            flag_name: candle-minutes
+            type: int
+            description: "Light candles this many minutes before sunset instead of the location's Chabad.org default (18 in most places, 40 in Jerusalem)"
+        response:
+          type: array
+          item: ZmanimDay
+        response_path: Days
+        pagination:
+          type: none
+  candles:
+    description: "Shabbat and Yom Tov candle-lighting and end times from Chabad.org, grouped by week and holiday"
+    endpoints:
+      weeks:
+        method: GET
+        path: /webservices/Zmanim/CandleLighting/Load_CandleLightingWeeks
+        description: "Upcoming Shabbat and holiday groups with candle-lighting, 'light from a pre-existing flame' second-night times, Shabbat/holiday end times, Hebrew dates, and Torah readings."
+        example: "  chabad-pp-cli candles --location-id 90034 --location-type 2 --from 2027-04-15 --weeks 3"
+        happy_args: "--location-id=11213;--location-type=2;--weeks=2"
+        id_field: GroupHeaderArticleId
+        params:
+          - name: locationid
+            flag_name: location-id
+            type: string
+            default: "11213"
+            description: "Chabad.org location ID: a city ID (location-type 1) or a 5-digit US ZIP code (location-type 2). Defaults to 11213 (Crown Heights, Brooklyn), so 'sync' has a location to store."
+          - name: locationtype
+            flag_name: location-type
+            type: int
+            default: 2
+            enum: ["1", "2"]
+            description: "1 = Chabad.org city ID, 2 = US ZIP code (default 2, matching the default ZIP)"
+          - name: startdate
+            flag_name: from
+            type: string
+            format: date
+            description: "Start searching for Shabbat/holidays from this day, YYYY-MM-DD (default: today)"
+          - name: weeks
+            url_name: limit
+            flag_name: weeks
+            type: int
+            default: 4
+            description: "Number of Shabbat weeks to return; holiday groups inside the window are added on top (this is a count, not pagination)"
+          - name: candle_minutes
+            url_name: before
+            flag_name: candle-minutes
+            type: int
+            description: "Light candles this many minutes before sunset instead of the location's Chabad.org default"
+        response:
+          type: array
+          item: CandleGroup
+        response_path: Groups
+        pagination:
+          type: none
+types:
+  LocationSuggestion:
+    fields:
+      - name: Title
+        type: string
+      - name: Value
+        type: string
+      - name: ItemType
+        type: string
+  ZmanimDay:
+    fields:
+      - name: DisplayDate
+        type: string
+      - name: DayOfWeek
+        type: integer
+      - name: Parsha
+        type: string
+      - name: HolidayName
+        type: string
+      - name: IsHoliday
+        type: bool
+      - name: IsDstActive
+        type: bool
+      - name: IsDayOfDstChange
+        type: bool
+      - name: GmtDate
+        type: string
+      - name: TimeGroups
+        type: '[]ref:TimeGroup'
+  TimeGroup:
+    fields:
+      - name: ZmanType
+        type: string
+      - name: Title
+        type: string
+      - name: HebrewTitle
+        type: string
+      - name: EssentialTitle
+        type: string
+      - name: Order
+        type: integer
+      - name: Items
+        type: '[]ref:ZmanItem'
+  ZmanItem:
+    fields:
+      - name: ZmanType
+        type: string
+      - name: Title
+        type: string
+      - name: Zman
+        type: string
+      - name: Date
+        type: string
+      - name: Default
+        type: bool
+      - name: OpinionDescription
+        type: string
+      - name: TechnicalInformation
+        type: string
+  CandleGroup:
+    fields:
+      - name: GroupHeaderTitle
+        type: string
+      - name: GroupHeaderType
+        type: string
+      - name: GroupSubHeaderTitle
+        type: string
+      - name: GroupHeaderArticleId
+        type: string
+      - name: Days
+        type: '[]ref:CandleDay'
+  CandleDay:
+    fields:
+      - name: WhenToLightString
+        type: string
+      - name: LightFromPreexistingFlame
+        type: bool
+      - name: JewishDay
+        type: integer
+      - name: JewishMonth
+        type: integer
+      - name: JewishYear
+        type: integer
+      - name: IsPrimaryHoliday
+        type: bool
+      - name: PrimaryZman
+        type: object
+      - name: JewishDate
+        type: object

@@ -13,7 +13,9 @@ added rather than overwriting. "Show in Finder" jumps to the result.
 Every push that touches this folder builds a `.dmg` for Apple-silicon Macs: GitHub →
 Actions → "Build PDF Tool (macOS)" → latest run → Artifacts → `PDF-Tool-macOS`.
 
-The build is not signed with an Apple Developer ID, so the first launch is blocked. Open
+The build is ad-hoc signed, not signed with an Apple Developer ID, so the first launch is blocked.
+If macOS instead says the app "is damaged", run `xattr -cr "/Applications/PDF Tool.app"` in
+Terminal once and open it again. Otherwise Open
 it once, then go to System Settings → Privacy & Security → "Open Anyway".
 
 ## Build it yourself (on the Mac)

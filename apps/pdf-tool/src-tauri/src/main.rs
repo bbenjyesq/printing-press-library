@@ -12,7 +12,8 @@ struct Saved {
 }
 
 fn is_pdf(path: &Path) -> bool {
-    path.extension().is_some_and(|e| e.eq_ignore_ascii_case("pdf"))
+    path.extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("pdf"))
 }
 
 /// The PDFs among `paths` with their sizes; a folder contributes the PDFs directly inside it.
@@ -37,34 +38,72 @@ fn list(paths: Vec<PathBuf>) -> Vec<(PathBuf, u64)> {
 
 #[tauri::command]
 async fn pick(app: tauri::AppHandle) -> Vec<PathBuf> {
-    let picked = app.dialog().file().add_filter("PDF", &["pdf"]).blocking_pick_files();
-    picked.into_iter().flatten().filter_map(|f| f.into_path().ok()).collect()
+    let picked = app
+        .dialog()
+        .file()
+        .add_filter("PDF", &["pdf"])
+        .blocking_pick_files();
+    picked
+        .into_iter()
+        .flatten()
+        .filter_map(|f| f.into_path().ok())
+        .collect()
 }
 
-/// Reduces and/or protects one PDF and saves the copy beside it as "<name>-small.pdf",
-/// "<name>-protected.pdf" or "<name>-small-protected.pdf". Never overwrites anything: if
+/// Reduces and/or protects one PDF — or, with `unlock`, removes its password — and saves
+/// the copy beside it as "<name>-small.pdf", "<name>-protected.pdf",
+/// "<name>-small-protected.pdf" or "<name>-unlocked.pdf". Never overwrites anything: if
 /// that name is taken, " 2", " 3"… is appended.
 #[tauri::command]
-async fn run(path: PathBuf, level: Option<String>, password: Option<String>) -> Result<Saved, String> {
+async fn run(
+    path: PathBuf,
+    level: Option<String>,
+    password: Option<String>,
+    unlock: bool,
+) -> Result<Saved, String> {
     if !is_pdf(&path) {
         return Err("That is not a PDF file.".into());
     }
     let input = std::fs::read(&path).map_err(|e| format!("Could not open the file ({e})."))?;
-    let output = pdfcore::process(&input, level.as_deref(), password.as_deref())?;
+    let output = if unlock {
+        pdfcore::unlock(&input, password.as_deref().unwrap_or_default())?
+    } else {
+        pdfcore::process(&input, level.as_deref(), password.as_deref())?
+    };
     let stem = path.file_stem().unwrap_or_default().to_string_lossy();
-    let suffix = match (level.is_some() && output.len() < input.len(), password.is_some()) {
-        (true, true) => "-small-protected",
-        (true, false) => "-small",
-        (false, _) => "-protected",
+    let suffix = if unlock {
+        "-unlocked"
+    } else {
+        match (
+            level.is_some() && output.len() < input.len(),
+            password.is_some(),
+        ) {
+            (true, true) => "-small-protected",
+            (true, false) => "-small",
+            (false, _) => "-protected",
+        }
     };
     for n in 1..1000 {
-        let count = if n == 1 { String::new() } else { format!(" {n}") };
+        let count = if n == 1 {
+            String::new()
+        } else {
+            format!(" {n}")
+        };
         let dest = path.with_file_name(format!("{stem}{suffix}{count}.pdf"));
         // create_new is the "never overwrite" guarantee.
-        match std::fs::OpenOptions::new().write(true).create_new(true).open(&dest) {
+        match std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&dest)
+        {
             Ok(mut file) => {
-                file.write_all(&output).map_err(|e| format!("Could not save the file ({e})."))?;
-                return Ok(Saved { path: dest, before: input.len() as u64, after: output.len() as u64 });
+                file.write_all(&output)
+                    .map_err(|e| format!("Could not save the file ({e})."))?;
+                return Ok(Saved {
+                    path: dest,
+                    before: input.len() as u64,
+                    after: output.len() as u64,
+                });
             }
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
             Err(e) => return Err(format!("Could not save next to the original ({e}).")),
@@ -75,7 +114,12 @@ async fn run(path: PathBuf, level: Option<String>, password: Option<String>) -> 
 
 #[tauri::command]
 fn reveal(path: PathBuf) -> Result<(), String> {
-    std::process::Command::new("open").arg("-R").arg(path).spawn().map(drop).map_err(|e| e.to_string())
+    std::process::Command::new("open")
+        .arg("-R")
+        .arg(path)
+        .spawn()
+        .map(drop)
+        .map_err(|e| e.to_string())
 }
 
 fn main() {
@@ -104,7 +148,8 @@ mod tests {
             pdf += &format!("{} 0 obj\n{body}\nendobj\n", i + 1);
         }
         let start = pdf.len();
-        (pdf + &xref + &format!("trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n{start}\n%%EOF\n")).into_bytes()
+        (pdf + &xref + &format!("trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n{start}\n%%EOF\n"))
+            .into_bytes()
     }
 
     #[test]
@@ -121,15 +166,43 @@ mod tests {
         assert_eq!(listed[0].0, original);
 
         let go = |level: Option<&str>| {
-            tauri::async_runtime::block_on(run(original.clone(), level.map(Into::into), Some("pw".into())))
+            tauri::async_runtime::block_on(run(
+                original.clone(),
+                level.map(Into::into),
+                Some("pw".into()),
+                false,
+            ))
         };
         let first = go(None).unwrap();
         let second = go(Some("balanced")).unwrap(); // nothing to shrink, still protected
         assert_eq!(first.path, dir.join("Exhibit A-protected.pdf"));
         assert_eq!(second.path, dir.join("Exhibit A-protected 2.pdf"));
-        assert_eq!(std::fs::read(&original).unwrap(), tiny_pdf(), "original untouched");
-        assert!(tauri::async_runtime::block_on(run(original.clone(), Some("balanced".into()), None)).is_err());
-        assert!(tauri::async_runtime::block_on(run(dir.join("notes.txt"), None, Some("pw".into()))).is_err());
+        assert_eq!(
+            std::fs::read(&original).unwrap(),
+            tiny_pdf(),
+            "original untouched"
+        );
+        assert!(tauri::async_runtime::block_on(run(
+            original.clone(),
+            Some("balanced".into()),
+            None,
+            false
+        ))
+        .is_err());
+        assert!(tauri::async_runtime::block_on(run(
+            dir.join("notes.txt"),
+            None,
+            Some("pw".into()),
+            false
+        ))
+        .is_err());
+        let unlocked =
+            tauri::async_runtime::block_on(run(first.path.clone(), None, Some("pw".into()), true))
+                .unwrap();
+        assert_eq!(unlocked.path, dir.join("Exhibit A-protected-unlocked.pdf"));
+        assert!(
+            tauri::async_runtime::block_on(run(first.path, None, Some("no".into()), true)).is_err()
+        );
         std::fs::remove_dir_all(&dir).unwrap();
     }
 }

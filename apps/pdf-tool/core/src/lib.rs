@@ -161,6 +161,25 @@ pub fn protect(input: &[u8], password: &str) -> Result<Vec<u8>, String> {
     Ok(out)
 }
 
+/// Returns an unprotected copy of a PDF whose password you know.
+pub fn unlock(input: &[u8], password: &str) -> Result<Vec<u8>, String> {
+    let mut doc = Document::load_mem(input).map_err(|e| format!("This file could not be read as a PDF ({e})."))?;
+    if !doc.is_encrypted() && !doc.was_encrypted() {
+        return Err("This PDF has no password.".into());
+    }
+    if doc.is_encrypted() {
+        // Decrypting while loading is the path that reads every object correctly;
+        // Document::decrypt() after a password-less load left the page tree unreadable.
+        doc = Document::load_mem_with_options(input, lopdf::LoadOptions::with_password(password))
+            .map_err(|_| "That password did not open this PDF.".to_string())?;
+    }
+    // The /Encrypt object is gone; keep the trailer's object count in step.
+    doc.max_id = doc.objects.keys().map(|id| id.0).max().unwrap_or(0);
+    let mut out = Vec::new();
+    doc.save_to(&mut out).map_err(|e| format!("Could not write the PDF ({e})."))?;
+    Ok(out)
+}
+
 /// Reduce (when `level` is given), then protect (when `password` is given).
 pub fn process(input: &[u8], level: Option<&str>, password: Option<&str>) -> Result<Vec<u8>, String> {
     let reduced = match (level.map(|l| reduce(input, l)), password) {
@@ -262,6 +281,22 @@ mod tests {
         assert!(process(b"not a pdf", Some("light"), Some("pw")).is_err());
         if std::env::var("PDFCORE_DUMP").is_ok() {
             std::fs::write("/tmp/pdfcore/both.pdf", &out).unwrap();
+        }
+    }
+
+    #[test]
+    fn unlock_removes_the_password() {
+        let input = sample();
+        let locked = protect(&input, "pässword 1").unwrap();
+        assert_eq!(unlock(&locked, "wrong").unwrap_err(), "That password did not open this PDF.");
+        assert_eq!(unlock(&input, "x").unwrap_err(), "This PDF has no password.");
+        let open = unlock(&locked, "pässword 1").unwrap();
+        let doc = Document::load_mem(&open).unwrap();
+        assert!(!doc.is_encrypted() && !doc.was_encrypted());
+        assert!(doc.extract_text(&[1]).unwrap().contains("Privileged and confidential"));
+        assert!(reduce(&open, "balanced").is_ok(), "an unlocked copy can then be reduced");
+        if std::env::var("PDFCORE_DUMP").is_ok() {
+            std::fs::write("/tmp/pdfcore/unlocked.pdf", &open).unwrap();
         }
     }
 

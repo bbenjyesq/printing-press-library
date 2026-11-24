@@ -1,11 +1,11 @@
 # PDF Tool
 
-A small Mac app (Tauri) that does two things to PDFs: make them smaller, add a password,
-or both in one pass. Drop one file, several, or a folder. Everything runs on your Mac; no
+A small Mac app (Tauri) for PDFs: make them smaller, add a password (or both in one
+pass), or remove a password you know. Drop one file, several, or a folder. Everything runs on your Mac; no
 file leaves the machine.
 
 Originals are never changed. Each copy is saved next to its original as `name-small.pdf`,
-`name-protected.pdf` or `name-small-protected.pdf`; if that name is taken, ` 2`, ` 3`… is
+`name-protected.pdf`, `name-small-protected.pdf` or `name-unlocked.pdf`; if that name is taken, ` 2`, ` 3`… is
 added rather than overwriting. "Show in Finder" jumps to the result.
 
 ## Get the app

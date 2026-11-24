@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Tool</title>
+<style>
+  :root {
+    --bg: #F7F6F3; --surface: #FFFFFF; --line: #E4E3DF; --ink: #1B1B1A; --muted: #6F6E69;
+    --ok-bg: #EDF3EC; --ok: #2C5A30; --err-bg: #FDEBEC; --err: #9F2F2D;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; padding: 28px; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+    display: flex; flex-direction: column; gap: 18px;
+    -webkit-user-select: none; user-select: none; cursor: default;
+  }
+  h1 { margin: 0; font: 600 26px/1.1 "New York", "Iowan Old Style", Georgia, serif; letter-spacing: -0.02em; }
+  p { margin: 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  #drop {
+    width: 100%; padding: 22px; text-align: left; background: var(--surface);
+    border: 1px dashed #BDBCB6; border-radius: 10px; display: flex; align-items: center; gap: 14px;
+    transition: border-color .15s, background .15s;
+  }
+  #drop:hover, #drop.over { border-color: var(--ink); background: #FDFDFC; }
+  #drop.has { border-style: solid; border-color: var(--line); }
+  #drop svg { flex: none; }
+  #drop strong { display: block; font-weight: 600; overflow-wrap: anywhere; }
+
+  .seg { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; background: #ECEBE7; border-radius: 9px; }
+  .seg label { text-align: center; padding: 8px; border-radius: 7px; font-weight: 500; color: var(--muted); }
+  .seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .seg input:focus-visible + label, .opt input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sr { position: absolute; opacity: 0; pointer-events: none; }
+
+  .panel { display: flex; flex-direction: column; gap: 8px; min-height: 196px; }
+  .panel[hidden] { display: none; }
+  .opt label {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .opt input:checked + label { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .opt b { font-weight: 600; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+  .field input {
+    padding: 10px 12px; font-size: 15px; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; -webkit-user-select: text; user-select: text;
+  }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+
+  #go {
+    margin-top: auto; padding: 13px; border: 0; border-radius: 8px; background: var(--ink); color: #fff;
+    font-weight: 600; transition: background .15s, transform .1s;
+  }
+  #go:hover:not(:disabled) { background: #3A3A38; }
+  #go:active:not(:disabled) { transform: scale(.985); }
+  #go:disabled { background: #C9C8C3; }
+  #status { min-height: 44px; padding: 11px 14px; border-radius: 8px; font-size: 14px; overflow-wrap: anywhere; }
+  #status.ok { background: var(--ok-bg); color: var(--ok); }
+  #status.err { background: var(--err-bg); color: var(--err); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+  <h1>PDF Tool</h1>
+
+  <button id="drop" type="button">
+    <svg width="30" height="36" viewBox="0 0 30 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 1h16l8 8v26H3z"/><path d="M19 1v8h8"/><path d="M9 20h12M9 26h12"/>
+    </svg>
+    <span>
+      <strong id="name">Choose a PDF</strong>
+      <span class="muted" id="meta">Click here, or drag a file onto this window</span>
+    </span>
+  </button>
+
+  <div class="seg" role="radiogroup" aria-label="What to do">
+    <input class="sr" type="radio" name="action" id="a-reduce" value="reduce" checked><label for="a-reduce">Reduce size</label>
+    <input class="sr" type="radio" name="action" id="a-protect" value="protect"><label for="a-protect">Add password</label>
+  </div>
+
+  <div class="panel" id="p-reduce" role="radiogroup" aria-label="How much to reduce">
+    <div class="opt"><input class="sr" type="radio" name="level" id="l-light" value="light"><label for="l-light"><b>Light</b><span class="muted">Best quality, good for printing</span></label></div>
+    <div class="opt"><input class="sr" type="radio" name="level" id="l-balanced" value="balanced" checked><label for="l-balanced"><b>Balanced</b><span class="muted">Recommended for email and e-filing</span></label></div>
+    <div class="opt"><input class="sr" type="radio" name="level" id="l-strong" value="strong"><label for="l-strong"><b>Smallest</b><span class="muted">Fine print in scans may blur</span></label></div>
+    <p class="muted">Text stays sharp and searchable. Only scans and pictures are compressed.</p>
+  </div>
+
+  <div class="panel" id="p-protect" hidden>
+    <label class="field">Password<input type="password" id="pw" autocomplete="new-password"></label>
+    <label class="field">Type it again<input type="password" id="pw2" autocomplete="new-password"></label>
+    <label class="check"><input type="checkbox" id="show"> Show password</label>
+    <p class="muted">The file will need this password to open. A forgotten password cannot be recovered, so keep your original.</p>
+  </div>
+
+  <button id="go" type="button" disabled>Reduce and save…</button>
+  <div id="status" role="status" aria-live="polite"></div>
+
+<script>
+  const { invoke } = window.__TAURI__.core;
+  const $ = (id) => document.getElementById(id);
+  const mb = (n) => n < 1e6 ? Math.max(1, Math.round(n / 1e3)) + ' KB' : (n / 1e6).toFixed(1) + ' MB';
+  let path = null, busy = false;
+
+  const action = () => document.querySelector('[name=action]:checked').value;
+  const say = (text, kind = '') => { $('status').textContent = text; $('status').className = kind; };
+
+  function refresh() {
+    const protect = action() === 'protect';
+    $('p-reduce').hidden = protect;
+    $('p-protect').hidden = !protect;
+    const mismatch = protect && $('pw2').value && $('pw').value !== $('pw2').value;
+    $('go').textContent = busy ? 'Working…' : protect ? 'Protect and save…' : 'Reduce and save…';
+    $('go').disabled = busy || !path || (protect && (!$('pw').value || $('pw').value !== $('pw2').value));
+    if (mismatch) say('The two passwords do not match.', 'err');
+    else if ($('status').textContent === 'The two passwords do not match.') say('');
+  }
+
+  async function setFile(p) {
+    if (!p || busy) return;
+    try {
+      const bytes = await invoke('size', { path: p });
+      path = p;
+      $('name').textContent = p.split('/').pop();
+      $('meta').textContent = mb(bytes) + ' · click to choose another';
+      $('drop').classList.add('has');
+      say('');
+    } catch (e) { say(String(e), 'err'); }
+    refresh();
+  }
+
+  $('drop').onclick = async () => setFile(await invoke('pick'));
+  window.__TAURI__.event.listen('tauri://drag-enter', () => $('drop').classList.add('over'));
+  window.__TAURI__.event.listen('tauri://drag-leave', () => $('drop').classList.remove('over'));
+  window.__TAURI__.event.listen('tauri://drag-drop', (e) => { $('drop').classList.remove('over'); setFile(e.payload.paths[0]); });
+
+  document.querySelectorAll('[name=action]').forEach((r) => r.onchange = () => { say(''); refresh(); });
+  $('pw').oninput = $('pw2').oninput = refresh;
+  $('show').onchange = () => { $('pw').type = $('pw2').type = $('show').checked ? 'text' : 'password'; };
+
+  $('go').onclick = async () => {
+    const protect = action() === 'protect';
+    busy = true; refresh(); say('');
+    try {
+      const arg = protect ? $('pw').value : document.querySelector('[name=level]:checked').value;
+      const r = await invoke('run', { path, action: action(), arg });
+      if (r) say(protect
+        ? `Saved ${r.name}. It now needs the password to open.`
+        : `Saved ${r.name}. ${mb(r.before)} → ${mb(r.after)}, ${Math.round(100 - 100 * r.after / r.before)}% smaller.`, 'ok');
+      if (r && protect) $('pw').value = $('pw2').value = '';
+    } catch (e) { say(String(e), 'err'); }
+    busy = false; refresh();
+  };
+</script>
+</body>
+</html>

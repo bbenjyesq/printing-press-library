@@ -1,0 +1,29 @@
+name: Build PDF Tool (macOS)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "apps/pdf-tool/**"
+      - ".github/workflows/build-pdf-tool.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14 # Apple silicon
+    defaults:
+      run:
+        working-directory: apps/pdf-tool
+    steps:
+      - uses: actions/checkout@v6
+      - name: Test the PDF engine
+        run: cargo test --release --manifest-path core/Cargo.toml
+      - name: Build the app
+        run: npx -y @tauri-apps/cli@2 build
+      - uses: actions/upload-artifact@v6
+        with:
+          name: PDF-Tool-macOS
+          path: apps/pdf-tool/src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: error

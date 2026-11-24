@@ -12,19 +12,19 @@
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body {
-    margin: 0; padding: 28px; background: var(--bg); color: var(--ink);
+    margin: 0; padding: 22px 26px; background: var(--bg); color: var(--ink);
     font: 15px/1.5 -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
-    display: flex; flex-direction: column; gap: 18px;
+    display: flex; flex-direction: column; gap: 14px;
     -webkit-user-select: none; user-select: none; cursor: default;
   }
-  h1 { margin: 0; font: 600 26px/1.1 "New York", "Iowan Old Style", Georgia, serif; letter-spacing: -0.02em; }
+  h1 { margin: 0; font: 600 22px/1.1 "New York", "Iowan Old Style", Georgia, serif; letter-spacing: -0.02em; }
   p { margin: 0; }
   .muted { color: var(--muted); font-size: 13px; }
   button, input { font: inherit; color: inherit; }
   :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
   #drop {
-    width: 100%; padding: 22px; text-align: left; background: var(--surface);
+    width: 100%; padding: 16px 18px; text-align: left; background: var(--surface);
     border: 1px dashed #BDBCB6; border-radius: 10px; display: flex; align-items: center; gap: 14px;
     transition: border-color .15s, background .15s;
   }
@@ -39,11 +39,14 @@
   .seg input:focus-visible + label, .opt input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
   .sr { position: absolute; opacity: 0; pointer-events: none; }
 
-  .panel { display: flex; flex-direction: column; gap: 8px; min-height: 196px; }
+  .panel { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field input { width: 100%; }
+  #foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
   .panel[hidden] { display: none; }
   .opt label {
     display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-    padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 9px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
   }
   .opt input:checked + label { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
   .opt b { font-weight: 600; }
@@ -56,13 +59,19 @@
   .check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
 
   #go {
-    margin-top: auto; padding: 13px; border: 0; border-radius: 8px; background: var(--ink); color: #fff;
+    padding: 13px; border: 0; border-radius: 8px; background: var(--ink); color: #fff;
     font-weight: 600; transition: background .15s, transform .1s;
   }
   #go:hover:not(:disabled) { background: #3A3A38; }
   #go:active:not(:disabled) { transform: scale(.985); }
   #go:disabled { background: #C9C8C3; }
-  #status { min-height: 44px; padding: 11px 14px; border-radius: 8px; font-size: 14px; overflow-wrap: anywhere; }
+  #status {
+    min-height: 44px; max-height: 112px; overflow-y: auto; padding: 11px 14px; border-radius: 8px;
+    font-size: 14px; overflow-wrap: anywhere; white-space: pre-line;
+    -webkit-user-select: text; user-select: text;
+  }
+  #reveal { display: block; margin-top: 6px; padding: 0; border: 0; background: none; color: inherit; font-weight: 600; text-decoration: underline; }
+  #reveal[hidden] { display: none; }
   #status.ok { background: var(--ok-bg); color: var(--ok); }
   #status.err { background: var(--err-bg); color: var(--err); }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -76,8 +85,8 @@
       <path d="M3 1h16l8 8v26H3z"/><path d="M19 1v8h8"/><path d="M9 20h12M9 26h12"/>
     </svg>
     <span>
-      <strong id="name">Choose a PDF</strong>
-      <span class="muted" id="meta">Click here, or drag a file onto this window</span>
+      <strong id="name">Choose PDFs</strong>
+      <span class="muted" id="meta">Click here, or drag files or a folder onto this window</span>
     </span>
   </button>
 
@@ -91,72 +100,94 @@
     <div class="opt"><input class="sr" type="radio" name="level" id="l-balanced" value="balanced" checked><label for="l-balanced"><b>Balanced</b><span class="muted">Recommended for email and e-filing</span></label></div>
     <div class="opt"><input class="sr" type="radio" name="level" id="l-strong" value="strong"><label for="l-strong"><b>Smallest</b><span class="muted">Fine print in scans may blur</span></label></div>
     <p class="muted">Text stays sharp and searchable. Only scans and pictures are compressed.</p>
+    <label class="check"><input type="checkbox" id="also"> Also add a password</label>
   </div>
 
-  <div class="panel" id="p-protect" hidden>
-    <label class="field">Password<input type="password" id="pw" autocomplete="new-password"></label>
-    <label class="field">Type it again<input type="password" id="pw2" autocomplete="new-password"></label>
+  <div class="panel" id="p-pw" hidden>
+    <div class="row">
+      <label class="field">Password<input type="password" id="pw" autocomplete="new-password"></label>
+      <label class="field">Type it again<input type="password" id="pw2" autocomplete="new-password"></label>
+    </div>
     <label class="check"><input type="checkbox" id="show"> Show password</label>
-    <p class="muted">The file will need this password to open. A forgotten password cannot be recovered, so keep your original.</p>
+    <p class="muted">A forgotten password cannot be recovered.</p>
   </div>
 
-  <button id="go" type="button" disabled>Reduce and save…</button>
-  <div id="status" role="status" aria-live="polite"></div>
+  <div id="foot">
+    <p class="muted">Copies are saved next to the originals. Originals are never changed.</p>
+    <button id="go" type="button" disabled>Reduce and save</button>
+    <div id="status" role="status" aria-live="polite"><span id="msg"></span><button id="reveal" type="button" hidden>Show in Finder</button></div>
+  </div>
 
 <script>
   const { invoke } = window.__TAURI__.core;
   const $ = (id) => document.getElementById(id);
   const mb = (n) => n < 1e6 ? Math.max(1, Math.round(n / 1e3)) + ' KB' : (n / 1e6).toFixed(1) + ' MB';
-  let path = null, busy = false;
+  const base = (p) => p.split('/').pop();
+  const MISMATCH = 'The two passwords do not match.';
+  let files = [], busy = false, last = null;
 
-  const action = () => document.querySelector('[name=action]:checked').value;
-  const say = (text, kind = '') => { $('status').textContent = text; $('status').className = kind; };
+  const reducing = () => $('a-reduce').checked;
+  const protecting = () => !reducing() || $('also').checked;
+
+  function say(text, kind = '', saved = null) {
+    $('msg').textContent = text; $('status').className = kind;
+    last = saved; $('reveal').hidden = !saved;
+  }
 
   function refresh() {
-    const protect = action() === 'protect';
-    $('p-reduce').hidden = protect;
-    $('p-protect').hidden = !protect;
-    const mismatch = protect && $('pw2').value && $('pw').value !== $('pw2').value;
-    $('go').textContent = busy ? 'Working…' : protect ? 'Protect and save…' : 'Reduce and save…';
-    $('go').disabled = busy || !path || (protect && (!$('pw').value || $('pw').value !== $('pw2').value));
-    if (mismatch) say('The two passwords do not match.', 'err');
-    else if ($('status').textContent === 'The two passwords do not match.') say('');
+    $('p-reduce').hidden = !reducing();
+    $('p-pw').hidden = !protecting();
+    const pwOk = !protecting() || ($('pw').value && $('pw').value === $('pw2').value);
+    const verb = reducing() ? (protecting() ? 'Reduce and protect' : 'Reduce') : 'Protect';
+    if (!busy) $('go').textContent = files.length > 1 ? `${verb} ${files.length} files` : `${verb} and save`;
+    $('go').disabled = busy || !files.length || !pwOk;
+    if (protecting() && $('pw2').value && $('pw').value !== $('pw2').value) say(MISMATCH, 'err');
+    else if ($('msg').textContent === MISMATCH) say('');
   }
 
-  async function setFile(p) {
-    if (!p || busy) return;
-    try {
-      const bytes = await invoke('size', { path: p });
-      path = p;
-      $('name').textContent = p.split('/').pop();
-      $('meta').textContent = mb(bytes) + ' · click to choose another';
-      $('drop').classList.add('has');
-      say('');
-    } catch (e) { say(String(e), 'err'); }
-    refresh();
+  async function setFiles(paths) {
+    if (busy || !paths.length) return;
+    const found = await invoke('list', { paths });
+    if (!found.length) return say('No PDF files found there.', 'err');
+    files = found.map(([path, bytes]) => ({ path, bytes }));
+    const total = mb(files.reduce((sum, f) => sum + f.bytes, 0));
+    $('name').textContent = files.length > 1 ? `${files.length} PDFs` : base(files[0].path);
+    $('meta').textContent = total + ' · click to choose others';
+    $('drop').classList.add('has');
+    say(''); refresh();
   }
 
-  $('drop').onclick = async () => setFile(await invoke('pick'));
+  $('drop').onclick = async () => setFiles(await invoke('pick'));
   window.__TAURI__.event.listen('tauri://drag-enter', () => $('drop').classList.add('over'));
   window.__TAURI__.event.listen('tauri://drag-leave', () => $('drop').classList.remove('over'));
-  window.__TAURI__.event.listen('tauri://drag-drop', (e) => { $('drop').classList.remove('over'); setFile(e.payload.paths[0]); });
+  window.__TAURI__.event.listen('tauri://drag-drop', (e) => { $('drop').classList.remove('over'); setFiles(e.payload.paths); });
 
   document.querySelectorAll('[name=action]').forEach((r) => r.onchange = () => { say(''); refresh(); });
-  $('pw').oninput = $('pw2').oninput = refresh;
+  $('also').onchange = $('pw').oninput = $('pw2').oninput = refresh;
   $('show').onchange = () => { $('pw').type = $('pw2').type = $('show').checked ? 'text' : 'password'; };
+  $('reveal').onclick = () => invoke('reveal', { path: last });
 
   $('go').onclick = async () => {
-    const protect = action() === 'protect';
+    const level = reducing() ? document.querySelector('[name=level]:checked').value : null;
+    const password = protecting() ? $('pw').value : null;
+    const saved = [], failed = [];
     busy = true; refresh(); say('');
-    try {
-      const arg = protect ? $('pw').value : document.querySelector('[name=level]:checked').value;
-      const r = await invoke('run', { path, action: action(), arg });
-      if (r) say(protect
-        ? `Saved ${r.name}. It now needs the password to open.`
-        : `Saved ${r.name}. ${mb(r.before)} → ${mb(r.after)}, ${Math.round(100 - 100 * r.after / r.before)}% smaller.`, 'ok');
-      if (r && protect) $('pw').value = $('pw2').value = '';
-    } catch (e) { say(String(e), 'err'); }
-    busy = false; refresh();
+    for (const [i, f] of files.entries()) {
+      $('go').textContent = files.length > 1 ? `Working… ${i + 1} of ${files.length}` : 'Working…';
+      try { saved.push(await invoke('run', { path: f.path, level, password })); }
+      catch (e) { failed.push(`${base(f.path)}: ${e}`); }
+    }
+    busy = false;
+    const before = saved.reduce((s, r) => s + r.before, 0), after = saved.reduce((s, r) => s + r.after, 0);
+    const lines = [];
+    if (saved.length) lines.push(
+      (saved.length > 1 ? `Saved ${saved.length} files.` : `Saved ${base(saved[0].path)}.`) +
+      (after < before ? ` ${mb(before)} → ${mb(after)}, ${Math.round(100 - 100 * after / before)}% smaller.` : '') +
+      (password ? ' Password required to open.' : ''));
+    if (failed.length) lines.push(files.length > 1 ? `${failed.length} not saved:` : 'Not saved.', ...failed);
+    say(lines.join('\n'), failed.length ? 'err' : 'ok', saved.length ? saved[saved.length - 1].path : null);
+    if (saved.length && password) $('pw').value = $('pw2').value = '';
+    refresh();
   };
 </script>
 </body>

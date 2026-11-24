@@ -161,6 +161,21 @@ pub fn protect(input: &[u8], password: &str) -> Result<Vec<u8>, String> {
     Ok(out)
 }
 
+/// Reduce (when `level` is given), then protect (when `password` is given).
+pub fn process(input: &[u8], level: Option<&str>, password: Option<&str>) -> Result<Vec<u8>, String> {
+    let reduced = match (level.map(|l| reduce(input, l)), password) {
+        (Some(Ok(out)), _) => Some(out),
+        (Some(Err(e)), None) => return Err(e),
+        // Already-compact files still get their password; an unreadable one fails in protect().
+        (Some(Err(_)), Some(_)) | (None, _) => None,
+    };
+    let data = reduced.as_deref().unwrap_or(input);
+    match password {
+        Some(pw) => protect(data, pw),
+        None => reduced.ok_or_else(|| "Nothing to do.".into()),
+    }
+}
+
 #[cfg(test)]
 #[allow(deprecated)]
 mod tests {
@@ -228,6 +243,25 @@ mod tests {
             std::fs::write("/tmp/pdfcore/in.pdf", &input).unwrap();
             std::fs::write("/tmp/pdfcore/small.pdf", &out).unwrap();
             std::fs::write("/tmp/pdfcore/locked.pdf", protect(&input, "pässword 1").unwrap()).unwrap();
+        }
+    }
+
+    #[test]
+    fn process_reduces_then_protects() {
+        let input = sample();
+        let out = process(&input, Some("balanced"), Some("pw")).unwrap();
+        assert!(out.len() < input.len() / 2);
+        assert!(Document::load_mem_with_password(&out, "nope").is_err());
+        let doc = Document::load_mem_with_password(&out, "pw").unwrap();
+        assert!(doc.extract_text(&[1]).unwrap().contains("Privileged and confidential"));
+        // Already compact: reduce alone is an error, but with a password the file is still protected.
+        let small = reduce(&input, "balanced").unwrap();
+        assert!(process(&small, Some("light"), None).is_err());
+        let locked = process(&small, Some("light"), Some("pw")).unwrap();
+        assert!(Document::load_mem_with_password(&locked, "pw").is_ok());
+        assert!(process(b"not a pdf", Some("light"), Some("pw")).is_err());
+        if std::env::var("PDFCORE_DUMP").is_ok() {
+            std::fs::write("/tmp/pdfcore/both.pdf", &out).unwrap();
         }
     }
 

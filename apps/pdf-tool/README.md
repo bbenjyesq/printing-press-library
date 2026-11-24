@@ -1,8 +1,12 @@
 # PDF Tool
 
-A small Mac app (Tauri) that does two things to a PDF: make it smaller, or add a password.
-Everything runs on your Mac; no file leaves the machine. The original is never changed —
-the app always saves a copy.
+A small Mac app (Tauri) that does two things to PDFs: make them smaller, add a password,
+or both in one pass. Drop one file, several, or a folder. Everything runs on your Mac; no
+file leaves the machine.
+
+Originals are never changed. Each copy is saved next to its original as `name-small.pdf`,
+`name-protected.pdf` or `name-small-protected.pdf`; if that name is taken, ` 2`, ` 3`… is
+added rather than overwriting. "Show in Finder" jumps to the result.
 
 ## Get the app
 
@@ -28,5 +32,6 @@ open src-tauri/target/release/bundle/dmg
   against a generated scan. Reduce: images are capped at 200/150/100 dpi-equivalent for a
   letter page and re-saved as JPEG; text, fonts and vector art are untouched. Password:
   AES-256, required to open the file.
-- `src-tauri/` — the window and the open/save dialogs.
+- `src-tauri/` — the window, the file picker, and saving the copies (`cargo test` there
+  checks the never-overwrite naming).
 - `ui/index.html` — the whole interface; no build step.

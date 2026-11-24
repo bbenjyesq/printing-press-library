@@ -45,11 +45,19 @@ steps, or files. Keep it lean: it finds and verifies authority; it does not war-
 
 ## Before you start
 
-1. **Lexis+ access.** Run `bash "<this skill's folder>/scripts/lexis.sh" doctor --agent`. If
-   `auth` is not configured or the session has expired, stop and tell the attorney, in plain
-   words, to sign in to Lexis+ in Chrome and then run `lexis-plus-pp-cli auth login --chrome`
-   (that is the one step only they can do). Do not fall back to another source for authority —
-   without Lexis+ this skill cannot deliver; offer `/legal-research` as the alternative instead.
+1. **Lexis+ access.** **First, make sure the Lexis+ session is live.** Before any Lexis+ work, tell the user in one line: "Checking your Lexis+ sign-in. If it has expired, a Chrome window will open; sign in there and it closes by itself." Then run, with a 10-minute timeout:
+   
+   ```bash
+   bash "<this skill's folder>/scripts/lexis-session.sh" ensure
+   ```
+   
+   - `LEXIS_SESSION_OK` (exit 0): continue.
+   - `LEXIS_SESSION_LOGIN` then `LEXIS_SESSION_OK` (exit 0): the session had expired and the user signed in again; continue.
+   - Exit 4 (`LEXIS_SESSION_EXPIRED`): the user did not finish signing in. Say so and stop; offer to try again.
+   - Exit 1 or 3 (`LEXIS_SESSION_ERROR`): report the message plainly and stop. Lexis+ may be unreachable, or the CLI is missing.
+   
+   Never ask the user for their password, never type it anywhere, and never run `press-auth` or `auth login` by hand; the script does both.
+   Without a live session this skill cannot deliver; do not fall back to another source for authority. Offer `/legal-research` instead.
 2. **Per-matter context.** If the current directory has a `claude.md`, read it (parties, claims,
    posture, venue, judge) and use it to sharpen the question. Optional.
 3. **Firm context.** Read `firm-context.md` in the working directory if present. Default:

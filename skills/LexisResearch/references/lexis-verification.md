@@ -21,6 +21,7 @@ For each result:
 - **Recognized, and the document title matches the case name used** → continue to Step 2.
 - **Recognized, but the title names a different case** → the hallucination signal (transposed
   numbers or a wrong name). Find the real case or cut the cite.
+- **`error (not checked)`** → the lookup failed (timeout, Lexis+ error); exit 5. That says nothing about the citation: retry it, and if it still fails, tag it UNVERIFIED and say it was not checked. If the error is an expired session (exit 4), run `scripts/lexis-session.sh login` as SKILL.md says and rerun.
 - **Not recognized** → correct it (parallel cite, typo) or cut it and substitute verified
   authority, or soften the proposition. A proposition left uncited is fine; a phantom cite is not.
 
@@ -58,6 +59,7 @@ For several at once, use `--input quotes.json` with an array of `{"id","quote","
 - Brackets and ellipses are treated as signaled changes. Every other difference is a defect:
   correct the quotation to match Lexis+ exactly, or turn it into a paraphrase.
 - If the checker reports a different page, correct the pin.
+- A pin matches only when it covers every page of the quotation. If the checker says the pin covers only part of it, use the full range it reports (e.g. `713-714`).
 - If it reports that the words come from a dissent, concurrence, or editorial material, either
   attribute them correctly or drop the quote.
 

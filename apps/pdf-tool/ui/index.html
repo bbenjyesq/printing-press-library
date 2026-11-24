@@ -70,8 +70,9 @@
     font-size: 14px; overflow-wrap: anywhere; white-space: pre-line;
     -webkit-user-select: text; user-select: text;
   }
-  #reveal { display: block; margin-top: 6px; padding: 0; border: 0; background: none; color: inherit; font-weight: 600; text-decoration: underline; }
-  #reveal[hidden] { display: none; }
+  #next { display: flex; gap: 18px; margin-top: 6px; }
+  #next[hidden], #next button[hidden] { display: none; }
+  #next button { padding: 0; border: 0; background: none; color: inherit; font-weight: 600; text-decoration: underline; }
   #status.ok { background: var(--ok-bg); color: var(--ok); }
   #status.err { background: var(--err-bg); color: var(--err); }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -116,7 +117,7 @@
   <div id="foot">
     <p class="muted">Copies are saved next to the originals. Originals are never changed.</p>
     <button id="go" type="button" disabled>Reduce and save</button>
-    <div id="status" role="status" aria-live="polite"><span id="msg"></span><button id="reveal" type="button" hidden>Show in Finder</button></div>
+    <div id="status" role="status" aria-live="polite"><span id="msg"></span><span id="next" hidden><button id="reveal" type="button">Show in Finder</button><button id="reset" type="button">Start a new job</button></span></div>
   </div>
 
 <script>
@@ -131,9 +132,10 @@
   const unlocking = () => $('a-unlock').checked;
   const protecting = () => $('a-protect').checked || (reducing() && $('also').checked);
 
-  function say(text, kind = '', saved = null) {
+  // `done` marks the end of a job: that is when "Show in Finder" / "Start a new job" appear.
+  function say(text, kind = '', saved = null, done = false) {
     $('msg').textContent = text; $('status').className = kind;
-    last = saved; $('reveal').hidden = !saved;
+    last = saved; $('reveal').hidden = !saved; $('next').hidden = !done;
   }
 
   function refresh() {
@@ -172,6 +174,14 @@
   $('also').onchange = $('pw').oninput = $('pw2').oninput = refresh;
   $('show').onchange = () => { $('pw').type = $('pw2').type = $('show').checked ? 'text' : 'password'; };
   $('reveal').onclick = () => invoke('reveal', { path: last });
+  $('reset').onclick = () => {
+    files = [];
+    $('name').textContent = 'Choose PDFs';
+    $('meta').textContent = 'Click here, or drag files or a folder onto this window';
+    $('drop').classList.remove('has');
+    $('pw').value = $('pw2').value = '';
+    say(''); refresh(); $('drop').focus();
+  };
 
   $('go').onclick = async () => {
     const level = reducing() ? document.querySelector('[name=level]:checked').value : null;
@@ -192,7 +202,7 @@
       (after < before ? ` ${mb(before)} → ${mb(after)}, ${Math.round(100 - 100 * after / before)}% smaller.` : '') +
       (unlock ? ' No password needed to open.' : password ? ' Password required to open.' : ''));
     if (failed.length) lines.push(files.length > 1 ? `${failed.length} not saved:` : 'Not saved.', ...failed);
-    say(lines.join('\n'), failed.length ? 'err' : 'ok', saved.length ? saved[saved.length - 1].path : null);
+    say(lines.join('\n'), failed.length ? 'err' : 'ok', saved.length ? saved[saved.length - 1].path : null, true);
     if (saved.length && password) $('pw').value = $('pw2').value = '';
     refresh();
   };

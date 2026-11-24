@@ -1,10 +1,13 @@
 //! PDF work for the app: shrink a PDF by recompressing its images, or lock it with a password.
 
-use image::{codecs::jpeg::JpegEncoder, imageops::FilterType, DynamicImage, GrayImage, RgbImage};
+use image::{imageops::FilterType, DynamicImage, GrayImage, RgbImage};
+use jpeg_encoder::{ColorType, Encoder, SamplingFactor};
 use lopdf::encryption::crypt_filters::{Aes256CryptFilter, CryptFilter};
-use lopdf::{Dictionary, Document, EncryptionState, EncryptionVersion, Object, Permissions, Stream};
+use lopdf::content::Content;
+use lopdf::{Dictionary, Document, EncryptionState, EncryptionVersion, Object, ObjectId, Permissions, Stream};
 use rayon::prelude::*;
-use std::{collections::BTreeMap, sync::Arc};
+use std::collections::{BTreeMap, HashMap};
+use std::sync::Arc;
 
 fn load(input: &[u8]) -> Result<Document, String> {
     let doc = Document::load_mem(input).map_err(|e| format!("This file could not be read as a PDF ({e})."))?;
@@ -14,17 +17,79 @@ fn load(input: &[u8]) -> Result<Document, String> {
     Ok(doc)
 }
 
-/// (longest side in pixels, JPEG quality) for "light" | "balanced" | "strong".
-// shortcut: caps pixels instead of computing each image's printed DPI — exact for
-// full-page letter scans (200/150/100 dpi), generous for anything smaller. Upgrade if
-// large-format pages (exhibits, plans) come out too soft.
-fn settings(level: &str) -> Result<(u32, u8), String> {
+/// (image resolution in dots per inch as printed, JPEG quality) for "light" | "balanced" | "strong".
+fn settings(level: &str) -> Result<(f32, u8), String> {
     match level {
-        "light" => Ok((2200, 75)),
-        "balanced" => Ok((1650, 60)),
-        "strong" => Ok((1100, 45)),
+        "light" => Ok((200.0, 75)),
+        "balanced" => Ok((130.0, 50)),
+        "strong" => Ok((96.0, 32)),
         _ => Err(format!("Unknown level: {level}")),
     }
+}
+
+/// Largest size, in points, at which each image is drawn on any page.
+type Sizes = HashMap<ObjectId, (f32, f32)>;
+
+fn xobjects(doc: &Document, resources: &Dictionary, names: &mut HashMap<Vec<u8>, ObjectId>) {
+    if let Ok(dict) = resources.get_deref(b"XObject", doc).and_then(Object::as_dict) {
+        names.extend(dict.iter().filter_map(|(name, obj)| Some((name.clone(), obj.as_reference().ok()?))));
+    }
+}
+
+/// Follows q/Q/cm/Do through a content stream (and nested forms), noting how big each image is drawn.
+/// `ctm` is the 2x2 part of the current transformation matrix; translation does not affect size.
+fn walk(doc: &Document, content: &[u8], names: &HashMap<Vec<u8>, ObjectId>, mut ctm: [f32; 4], depth: u8, sizes: &mut Sizes) {
+    let mul = |m: [f32; 4], c: [f32; 4]| [m[0] * c[0] + m[1] * c[2], m[0] * c[1] + m[1] * c[3], m[2] * c[0] + m[3] * c[2], m[2] * c[1] + m[3] * c[3]];
+    let nums = |objs: &[Object]| -> Option<[f32; 4]> {
+        Some([objs.first()?.as_float().ok()?, objs.get(1)?.as_float().ok()?, objs.get(2)?.as_float().ok()?, objs.get(3)?.as_float().ok()?])
+    };
+    let Ok(content) = Content::decode(content) else { return };
+    let mut stack = Vec::new();
+    for op in content.operations {
+        match op.operator.as_str() {
+            "q" => stack.push(ctm),
+            "Q" => ctm = stack.pop().unwrap_or(ctm),
+            "cm" => ctm = nums(&op.operands).map_or(ctm, |m| mul(m, ctm)),
+            "Do" => {
+                let Some(id) = op.operands.first().and_then(|n| n.as_name().ok()).and_then(|n| names.get(n)) else { continue };
+                let Ok(stream) = doc.get_object(*id).and_then(Object::as_stream) else { continue };
+                match stream.dict.get(b"Subtype").and_then(Object::as_name) {
+                    Ok(b"Image") => {
+                        let (w, h) = (ctm[0].hypot(ctm[1]), ctm[2].hypot(ctm[3]));
+                        let size = sizes.entry(*id).or_default();
+                        *size = (size.0.max(w), size.1.max(h));
+                    }
+                    Ok(b"Form") if depth < 8 => {
+                        let matrix = stream.dict.get(b"Matrix").and_then(Object::as_array).ok().and_then(|m| nums(m));
+                        let mut inner = names.clone();
+                        if let Ok(res) = stream.dict.get_deref(b"Resources", doc).and_then(Object::as_dict) {
+                            xobjects(doc, res, &mut inner);
+                        }
+                        if let Ok(data) = stream.decompressed_content() {
+                            walk(doc, &data, &inner, matrix.map_or(ctm, |m| mul(m, ctm)), depth + 1, sizes);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+fn drawn_sizes(doc: &Document) -> Sizes {
+    let mut sizes = Sizes::new();
+    for page in doc.get_pages().into_values() {
+        let mut names = HashMap::new();
+        if let Ok((inline, ids)) = doc.get_page_resources(page) {
+            // Nearest resources last, so they win over inherited ones.
+            for res in ids.iter().rev().filter_map(|id| doc.get_dictionary(*id).ok()).chain(inline) {
+                xobjects(doc, res, &mut names);
+            }
+        }
+        walk(doc, &doc.get_page_content(page), &names, [1.0, 0.0, 0.0, 1.0], 0, &mut sizes);
+    }
+    sizes
 }
 
 /// Colour channels of an image we know how to re-encode as JPEG (gray or RGB), else None.
@@ -58,7 +123,7 @@ fn filter_name(dict: &Dictionary) -> Option<&[u8]> {
 }
 
 /// A smaller JPEG version of one image stream, or None to leave it untouched.
-fn shrink_image(doc: &Document, s: &Stream, max_side: u32, quality: u8) -> Option<Stream> {
+fn shrink_image(doc: &Document, s: &Stream, drawn: Option<&(f32, f32)>, dpi: f32, quality: u8) -> Option<Stream> {
     let d = &s.dict;
     if d.get(b"Subtype").ok()?.as_name().ok()? != b"Image"
         || d.has(b"ImageMask")
@@ -69,7 +134,7 @@ fn shrink_image(doc: &Document, s: &Stream, max_side: u32, quality: u8) -> Optio
         return None;
     }
     let n = channels(doc, d)?;
-    let img = match filter_name(d)? {
+    let mut img = match filter_name(d)? {
         b"DCTDecode" => {
             let img = image::load_from_memory_with_format(&s.content, image::ImageFormat::Jpeg).ok()?;
             // CMYK and friends decode to something that no longer matches /ColorSpace.
@@ -90,13 +155,29 @@ fn shrink_image(doc: &Document, s: &Stream, max_side: u32, quality: u8) -> Optio
         }
         _ => return None,
     };
-    let img = if img.width().max(img.height()) > max_side {
-        img.resize(max_side, max_side, FilterType::Triangle)
-    } else {
-        img
+    let (w, h) = (img.width() as f32, img.height() as f32);
+    let scale = match drawn {
+        Some((dw, dh)) => (dw / w).max(dh / h) * dpi / 72.0,
+        // shortcut: an image the page walk did not find (pattern fills, soft masks) is assumed to
+        // fill a letter page. Upgrade if such images come out too soft or too large.
+        None => 11.0 * dpi / w.max(h),
     };
+    if scale < 0.9 {
+        img = img.resize_exact(((w * scale).round() as u32).max(1), ((h * scale).round() as u32).max(1), FilterType::Triangle);
+    }
+    // A colour scan of a black-and-white page is stored as grey: a third of the data, same look.
+    if let DynamicImage::ImageRgb8(rgb) = &img {
+        if rgb.pixels().step_by(5).all(|p| p.0.iter().max().unwrap() - p.0.iter().min().unwrap() <= 16) {
+            img = DynamicImage::ImageLuma8(img.to_luma8());
+        }
+    }
+    let color = if img.color().has_color() { ColorType::Rgb } else { ColorType::Luma };
     let mut jpeg = Vec::new();
-    img.write_with_encoder(JpegEncoder::new_with_quality(&mut jpeg, quality)).ok()?;
+    let mut encoder = Encoder::new(&mut jpeg, quality);
+    encoder.set_sampling_factor(SamplingFactor::F_2_2);
+    encoder.set_optimized_huffman_tables(true);
+    encoder.set_progressive(true);
+    encoder.encode(img.as_bytes(), u16::try_from(img.width()).ok()?, u16::try_from(img.height()).ok()?, color).ok()?;
     if jpeg.len() >= s.content.len() {
         return None;
     }
@@ -105,18 +186,22 @@ fn shrink_image(doc: &Document, s: &Stream, max_side: u32, quality: u8) -> Optio
     dict.set("Height", img.height() as i64);
     dict.set("Filter", "DCTDecode");
     dict.remove(b"DecodeParms");
+    if color == ColorType::Luma {
+        dict.set("ColorSpace", "DeviceGray");
+    }
     Some(Stream::new(dict, jpeg))
 }
 
 /// Returns a smaller copy of the PDF. Text, fonts and vector art are untouched; only
 /// images are downsampled and recompressed.
 pub fn reduce(input: &[u8], level: &str) -> Result<Vec<u8>, String> {
-    let (max_side, quality) = settings(level)?;
+    let (dpi, quality) = settings(level)?;
     let mut doc = load(input)?;
+    let sizes = drawn_sizes(&doc);
     let smaller: Vec<_> = doc
         .objects
         .par_iter()
-        .filter_map(|(id, obj)| Some((*id, shrink_image(&doc, obj.as_stream().ok()?, max_side, quality)?)))
+        .filter_map(|(id, obj)| Some((*id, shrink_image(&doc, obj.as_stream().ok()?, sizes.get(id), dpi, quality)?)))
         .collect();
     for (id, stream) in smaller {
         doc.objects.insert(id, Object::Stream(stream));
@@ -256,7 +341,7 @@ mod tests {
         let doc = Document::load_mem(&out).unwrap();
         assert!(doc.extract_text(&[1]).unwrap().contains("Privileged and confidential"));
         let widths: Vec<i64> = doc.objects.values().filter_map(|o| o.as_stream().ok()?.dict.get(b"Width").ok()?.as_i64().ok()).collect();
-        assert_eq!(widths, [1320]); // 2400x3000 capped to a 1650 long side
+        assert_eq!(widths, [1144]); // 2400x3000 px drawn 612x792 pt, resampled to 130 dpi on its tighter axis
         assert!(reduce(&out, "light").is_err(), "nothing left to gain");
         if std::env::var("PDFCORE_DUMP").is_ok() {
             std::fs::write("/tmp/pdfcore/in.pdf", &input).unwrap();

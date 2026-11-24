@@ -31,8 +31,10 @@ open src-tauri/target/release/bundle/dmg
 ## How it works
 
 - `core/` — the PDF engine (Rust, `lopdf` + `image`). `cargo test` in that folder runs it
-  against a generated scan. Reduce: images are capped at 200/150/100 dpi-equivalent for a
-  letter page and re-saved as JPEG; text, fonts and vector art are untouched. Password:
+  against a generated scan. Reduce: each image is resampled to 200/130/96 dpi at the size it is actually
+  printed on the page and re-saved as JPEG (near-grey colour scans become grey); text, fonts
+  and vector art are untouched. Black-and-white (1-bit) scans are already compact and are
+  left alone. Password:
   AES-256, required to open the file.
 - `src-tauri/` — the window, the file picker, and saving the copies (`cargo test` there
   checks the never-overwrite naming).

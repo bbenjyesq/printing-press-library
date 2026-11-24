@@ -8,3 +8,4 @@ lopdf = "0.47"
 image = { version = "0.25", default-features = false, features = ["jpeg"] }
 rayon = "1"
 rand = "0.10"
+jpeg-encoder = "0.7"
